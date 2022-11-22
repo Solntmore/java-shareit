@@ -8,9 +8,10 @@ import java.util.Optional;
 
 public interface ItemStorage {
     Item createItem(Item item, long userId);
-    ItemDto updateItem(Item newItem, long ItemId, long userId);
 
-    Optional<Item> findItemById(long  itemId);
+    ItemDto updateItem(Item newItem, long itemId, long userId);
+
+    Optional<Item> findItemById(long itemId);
 
     Collection<Item> findAllItems();
 }

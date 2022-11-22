@@ -23,7 +23,7 @@ public class UserInMemoryStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        if (сheckEmailForUniqueness(user.getEmail())) {
+        if (isEmailNotExist(user.getEmail())) {
             user.setId(counter.increaseId());
             usersMap.put(user.getId(), user);
             log.debug("Пользователь {} успешно создан.", user);
@@ -49,7 +49,7 @@ public class UserInMemoryStorage implements UserStorage {
 
             if (patternMatches(email)) {
 
-                if (сheckEmailForUniqueness(email)) {
+                if (isEmailNotExist(email)) {
                     user.setEmail(email);
                 } else {
                     throw new UniquenessEmailException("This email is already registered, try another one");
@@ -83,7 +83,7 @@ public class UserInMemoryStorage implements UserStorage {
                 .matches();
     }
 
-    private boolean сheckEmailForUniqueness(String email) {
+    private boolean isEmailNotExist(String email) {
         for (User user : usersMap.values()) {
             if (user.getEmail().equals(email)) {
                 return false;
