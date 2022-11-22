@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import ru.practicum.shareit.request.ItemRequest;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -15,18 +15,15 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @Data
 @AllArgsConstructor
-public class Item {
+public class User {
 
     private long id;
 
-    @NotBlank
+    @NotBlank(message = "Name may not be blank.")
     private String name;
 
-    @NotBlank
-    private String description;
+    @Email(message = "Enter the correct email.")
+    @NotNull(message = "Email can`t be null.")
+    private String email;
 
-    @NotNull
-    private Boolean available;
-    private long owner;
-    private ItemRequest request;
 }

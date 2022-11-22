@@ -1,27 +1,25 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
-
-/**
- * TODO Sprint add-controllers.
- */
 
 @Slf4j
 @Data
 @AllArgsConstructor
-public class ItemDto {
+public class UserDto {
 
     @Positive
     private long id;
-    @NotBlank
+
+    @NotBlank(message = "Name may not be blank")
     private String name;
 
-    @NotBlank
-    private String description;
-    private Boolean available;
+    @Email
+    private String email;
 }
