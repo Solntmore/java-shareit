@@ -1,9 +1,8 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.Counter;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ForbiddenOwnerException;
 import ru.practicum.shareit.item.exceptions.InvalidDescriptionException;
@@ -12,21 +11,22 @@ import ru.practicum.shareit.user.exceptions.InvalidNameException;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-import static ru.practicum.shareit.item.ItemMapper.toItemDto;
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ItemInMemoryStorage implements ItemStorage {
 
-    private final HashMap<Long, Item> itemsMap = new HashMap<>();
-    private final Counter counter = new Counter();
+    private final Map<Long, Item> itemsMap = new HashMap<>();
+    private long counter = 0;
 
     @Override
     public Item createItem(Item item, long userId) {
-        item.setId(counter.increaseId());
+        item.setId(increaseCounter());
         item.setOwner(userId);
         itemsMap.put(item.getId(), item);
         return item;
@@ -77,5 +77,9 @@ public class ItemInMemoryStorage implements ItemStorage {
     @Override
     public Collection<Item> findAllItems() {
         return itemsMap.values();
+    }
+
+    private long increaseCounter() {
+        return ++counter;
     }
 }

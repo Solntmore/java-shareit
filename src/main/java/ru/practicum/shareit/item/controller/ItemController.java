@@ -1,14 +1,17 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
 /**
  * TODO Sprint add-controllers.
@@ -30,17 +33,11 @@ public class ItemController {
 
 
     @GetMapping(value = {"/search", ""})
-    public List<ItemDto> findItemsWithParameters(@RequestHeader("X-Sharer-User-Id") long userId,
+    public List<ItemDto> findItemsWithParameters(@RequestHeader(X_SHADER_USER_ID) long userId,
                                                  @RequestParam(name = "text", required = false) String query) {
-        if (query == null) {
-            log.debug("Get /items request was received. Get all items with ownerId {}.", userId);
+        log.debug("Method findItemsWithParameters in ItemController is running");
 
-            return itemService.findAllItems(userId);
-        } else {
-            log.debug("Get /items/text={} request was received. Get all items with query and ownerId {}.", query, userId);
-
-            return itemService.findItemByDescriptionAndOwnerId(query);
-        }
+        return itemService.findAllItemsWithParameters(userId, query);
     }
 
     @GetMapping("/{itemId}")
@@ -51,7 +48,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody @Valid Item item) {
+    public ItemDto createItem(@RequestHeader(X_SHADER_USER_ID) long userId, @RequestBody @Valid Item item) {
         log.debug("A Post/items request was received. Create an item {} with owner id {}.", item, userId);
         userService.findUserById(userId);
 
@@ -59,7 +56,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody Item newItem,
+    public ItemDto updateItem(@RequestHeader(X_SHADER_USER_ID) long userId, @RequestBody Item newItem,
                               @PathVariable long itemId) {
         log.debug("A Patch/items request was received. Update an item {} with owner id {}.", newItem, userId);
         userService.findUserById(userId);

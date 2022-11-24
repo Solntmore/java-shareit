@@ -1,30 +1,29 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.Counter;
-import ru.practicum.shareit.user.exceptions.InvalidEmailException;
 import ru.practicum.shareit.user.exceptions.UniquenessEmailException;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.Email;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
 public class UserInMemoryStorage implements UserStorage {
 
-    private final HashMap<Long, User> usersMap = new HashMap<>();
-    private final Counter counter = new Counter();
+    private final Map<Long, User> usersMap = new HashMap<>();
+    private long counter = 0;
 
     @Override
     public User createUser(User user) {
         if (isEmailNotExist(user.getEmail())) {
-            user.setId(counter.increaseId());
+            user.setId(increaseCounter());
             usersMap.put(user.getId(), user);
             log.debug("Пользователь {} успешно создан.", user);
             return user;
@@ -45,19 +44,10 @@ public class UserInMemoryStorage implements UserStorage {
         Optional<String> optionalEmail = Optional.ofNullable(updateUser.getEmail());
 
         if (optionalEmail.isPresent()) {
+
+            @Email
             String email = optionalEmail.get();
-
-            if (patternMatches(email)) {
-
-                if (isEmailNotExist(email)) {
-                    user.setEmail(email);
-                } else {
-                    throw new UniquenessEmailException("This email is already registered, try another one");
-                }
-
-            } else {
-                throw new InvalidEmailException("Enter the correct email.");
-            }
+            setEmailIfEmailNotExist(email, user);
         }
 
         optionalName.ifPresent(user::setName);
@@ -75,12 +65,11 @@ public class UserInMemoryStorage implements UserStorage {
         return usersMap.values();
     }
 
-    private boolean patternMatches(String emailAddress) {
-        String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        return Pattern.compile(regexPattern)
-                .matcher(emailAddress)
-                .matches();
+    private void setEmailIfEmailNotExist(String email, User user) {
+        if (!isEmailNotExist(email)) {
+            throw new UniquenessEmailException("This email is already registered, try another one");
+        }
+        user.setEmail(email);
     }
 
     private boolean isEmailNotExist(String email) {
@@ -90,5 +79,9 @@ public class UserInMemoryStorage implements UserStorage {
             }
         }
         return true;
+    }
+
+    private long increaseCounter() {
+        return ++counter;
     }
 }
