@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -33,7 +31,7 @@ public class ItemInMemoryStorage implements ItemStorage {
     }
 
     @Override
-    public ItemDto updateItem(Item newItem, long itemId, long userId) {
+    public Item updateItem(Item newItem, long itemId, long userId) {
         Item oldItem = itemsMap.get(itemId);
 
         if (oldItem.getOwner() != userId) {
@@ -66,7 +64,7 @@ public class ItemInMemoryStorage implements ItemStorage {
         }
 
         itemsMap.put(oldItem.getId(), oldItem);
-        return toItemDto(oldItem);
+        return oldItem;
     }
 
     @Override

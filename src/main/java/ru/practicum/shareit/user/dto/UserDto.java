@@ -9,7 +9,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
-@Slf4j
 @Data
 @AllArgsConstructor
 public class UserDto {

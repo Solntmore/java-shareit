@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
  * TODO Sprint add-controllers.
  */
 
-@Slf4j
 @Data
 @AllArgsConstructor
 public class User {

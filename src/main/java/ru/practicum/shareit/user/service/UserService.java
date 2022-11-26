@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
-import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.user.mapper.UserMapper.toUserDto;
 
 @Slf4j
 @Service
@@ -21,19 +20,20 @@ import static ru.practicum.shareit.user.mapper.UserMapper.toUserDto;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final UserMapperImpl userMapper;
 
     public UserDto createUser(User user) {
-        return toUserDto(userStorage.createUser(user));
+        return userMapper.userToDto(userStorage.createUser(user));
     }
 
     public UserDto findUserById(long userId) {
         User user = userStorage.findUserById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
-        return toUserDto(user);
+        return userMapper.userToDto(user);
     }
 
     public UserDto updateUser(long userId, User updateUser) {
-        return toUserDto(userStorage.updateUser(userId, updateUser));
+        return userMapper.userToDto(userStorage.updateUser(userId, updateUser));
     }
 
     public void deleteUserById(long id) {
@@ -43,7 +43,7 @@ public class UserService {
     public List<UserDto> findAllUsers() {
         return userStorage.findAllUsers()
                 .stream().sorted(Comparator.comparingLong(User::getId))
-                .map(UserMapper::toUserDto)
+                .map(userMapper::userToDto)
                 .collect(Collectors.toList());
     }
 }
