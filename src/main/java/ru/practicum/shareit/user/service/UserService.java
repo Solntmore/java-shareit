@@ -3,7 +3,8 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.RequestUserDto;
+import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapperImpl;
 import ru.practicum.shareit.user.model.User;
@@ -22,25 +23,31 @@ public class UserService {
     private final UserStorage userStorage;
     private final UserMapperImpl userMapper;
 
-    public UserDto createUser(User user) {
-        return userMapper.userToDto(userStorage.createUser(user));
+    /* Выяснил, что Dto нужна не только на выход, но и на вход. Преобразование и из Dto в User,
+    и из User в Dto правильно делать в сервисе? Кажется, как будто получается нагромождение */
+    public ResponseUserDto createUser(RequestUserDto requestUserDto) {
+
+        return userMapper.userToDto(
+                userStorage.createUser(
+                        userMapper.requestDtoToUser(requestUserDto)));
     }
 
-    public UserDto findUserById(long userId) {
+    public ResponseUserDto findUserById(long userId) {
         User user = userStorage.findUserById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
         return userMapper.userToDto(user);
     }
 
-    public UserDto updateUser(long userId, User updateUser) {
-        return userMapper.userToDto(userStorage.updateUser(userId, updateUser));
+    public ResponseUserDto updateUser(long userId, RequestUserDto updateUser) {
+        return userMapper.userToDto(
+                userStorage.updateUser(userId, userMapper.requestDtoToUser(updateUser)));
     }
 
     public void deleteUserById(long id) {
         userStorage.deleteUserById(id);
     }
 
-    public List<UserDto> findAllUsers() {
+    public List<ResponseUserDto> findAllUsers() {
         return userStorage.findAllUsers()
                 .stream().sorted(Comparator.comparingLong(User::getId))
                 .map(userMapper::userToDto)

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
 
@@ -10,10 +9,9 @@ import javax.validation.constraints.NotBlank;
  * TODO Sprint add-controllers.
  */
 
-@Slf4j
 @Data
 @AllArgsConstructor
-public class ItemDto {
+public class ResponseItemDto {
 
     private long id;
 

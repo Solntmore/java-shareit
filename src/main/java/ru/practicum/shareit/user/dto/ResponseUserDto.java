@@ -6,11 +6,12 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
-public class UserDto {
+public class ResponseUserDto {
 
     @Positive
     private long id;
@@ -18,6 +19,7 @@ public class UserDto {
     @NotBlank(message = "Name may not be blank")
     private String name;
 
-    @Email
+    @Email(message = "Enter the correct email.")
+    @NotNull(message = "Email can`t be null.")
     private String email;
 }

@@ -3,7 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.RequestItemDto;
+import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
@@ -22,27 +23,32 @@ public class ItemService {
     private final ItemStorage itemStorage;
     private final ItemMapperImpl itemMapper;
 
-    public ItemDto createItem(Item item, long userId) {
-        return itemMapper.itemToDto(itemStorage.createItem(item, userId));
+    public ResponseItemDto createItem(RequestItemDto requestItemDto, long userId) {
+        return itemMapper.itemToDto(
+                itemStorage.createItem(
+                        itemMapper.requestItemToDto(requestItemDto), userId));
     }
 
-    public ItemDto updateItem(Item newItem, long itemId, long userId) {
+    public ResponseItemDto updateItem(RequestItemDto newItem, long itemId, long userId) {
 
-        return itemMapper.itemToDto(itemStorage.updateItem(newItem, itemId, userId));
+        return itemMapper.itemToDto(
+                itemStorage.updateItem(
+                        itemMapper.requestItemToDto(newItem), itemId, userId));
     }
 
-    public ItemDto findItemById(long itemId) {
+    public ResponseItemDto findItemById(long itemId) {
 
-        Item item = itemStorage.findItemById(itemId).orElseThrow(() ->
-                new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
+        Item item = itemStorage.findItemById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
         return itemMapper.itemToDto(item);
     }
 
-    public List<ItemDto> findAllItemsWithParameters(long userId, String query) {
+    public List<ResponseItemDto> findAllItemsWithParameters(long userId, String query) {
         if (query == null) {
             log.debug("Get /items request was received. Get all items with ownerId {}.", userId);
 
-            return itemStorage.findAllItems().stream()
+            return itemStorage.findAllItems()
+                    .stream()
                     .filter(item -> item.getOwner() == userId)
                     .sorted(Comparator.comparingLong(Item::getId))
                     .map(itemMapper::itemToDto)
@@ -55,7 +61,8 @@ public class ItemService {
                 return new ArrayList<>();
             }
 
-            return itemStorage.findAllItems().stream()
+            return itemStorage.findAllItems()
+                    .stream()
                     .filter(item -> item.getAvailable())
                     .filter(item -> item.getName().toLowerCase().contains(lowerQuery)
                             || item.getDescription().toLowerCase().contains(lowerQuery))
