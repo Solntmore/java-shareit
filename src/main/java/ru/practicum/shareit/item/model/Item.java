@@ -1,32 +1,49 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import lombok.*;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.request.ItemRequest;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
+import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
-
-@Slf4j
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
 
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @NotBlank
+    @Column(name = "name", length=512, nullable = false)
     private String name;
 
-    @NotBlank
+    @Column(name = "description", length=512, nullable = false)
     private String description;
 
-    @NotNull
+    @Column(name = "available", nullable = false)
     private Boolean available;
+
+    @Column(name = "owner")
     private long owner;
+/*
     private ItemRequest request;
+*/
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Item item = (Item) o;
+        return id != null && Objects.equals(id, item.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

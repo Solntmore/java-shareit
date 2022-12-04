@@ -13,10 +13,6 @@ import java.util.List;
 
 import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
-/**
- * TODO Sprint add-controllers.
- */
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor

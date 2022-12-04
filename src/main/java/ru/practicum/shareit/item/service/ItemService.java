@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.item.storage.ItemStorage;
 
 import java.util.ArrayList;
@@ -21,24 +22,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemStorage itemStorage;
+
+    private final ItemRepository itemRepository;
     private final ItemMapperImpl itemMapper;
 
     public ResponseItemDto createItem(RequestItemDto requestItemDto, long userId) {
+
         return itemMapper.itemToDto(
-                itemStorage.createItem(
-                        itemMapper.requestItemToDto(requestItemDto), userId));
+                itemRepository.save(
+                        itemRepository.setOwner(
+                                itemMapper.requestItemDtoToItem(requestItemDto), userId)));
     }
 
     public ResponseItemDto updateItem(RequestItemDto newItem, long itemId, long userId) {
 
         return itemMapper.itemToDto(
-                itemStorage.updateItem(
-                        itemMapper.requestItemToDto(newItem), itemId, userId));
+                itemRepository.patchItem(
+                        itemMapper.requestItemDtoToItem(newItem), itemId, userId));
     }
 
     public ResponseItemDto findItemById(long itemId) {
 
-        Item item = itemStorage.findItemById(itemId)
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
         return itemMapper.itemToDto(item);
     }
@@ -47,7 +52,8 @@ public class ItemService {
         if (query == null) {
             log.debug("Get /items request was received. Get all items with ownerId {}.", userId);
 
-            return itemStorage.findAllItems()
+            /* Попробовать с сортировкой findAllSort */
+            return itemRepository.findAll()
                     .stream()
                     .filter(item -> item.getOwner() == userId)
                     .sorted(Comparator.comparingLong(Item::getId))
@@ -61,7 +67,7 @@ public class ItemService {
                 return new ArrayList<>();
             }
 
-            return itemStorage.findAllItems()
+            return itemRepository.findAll()
                     .stream()
                     .filter(item -> item.getAvailable())
                     .filter(item -> item.getName().toLowerCase().contains(lowerQuery)

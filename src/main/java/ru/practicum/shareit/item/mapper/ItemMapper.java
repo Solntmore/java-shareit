@@ -14,5 +14,5 @@ public interface ItemMapper {
 
     ResponseItemDto itemToRequestDto(Item item);
 
-    Item requestItemToDto(RequestItemDto requestItemDto);
+    Item requestItemDtoToItem(RequestItemDto requestItemDto);
 }
