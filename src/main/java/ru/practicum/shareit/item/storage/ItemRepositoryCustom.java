@@ -6,6 +6,5 @@ public interface ItemRepositoryCustom {
 
     Item setOwner(Item item, long ownerId);
 
-
     Item patchItem(Item newItem, long itemId, long userId);
 }

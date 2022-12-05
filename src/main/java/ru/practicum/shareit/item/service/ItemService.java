@@ -9,19 +9,18 @@ import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapperImpl;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.item.storage.ItemStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-    private final ItemStorage itemStorage;
 
     private final ItemRepository itemRepository;
     private final ItemMapperImpl itemMapper;
@@ -52,13 +51,11 @@ public class ItemService {
         if (query == null) {
             log.debug("Get /items request was received. Get all items with ownerId {}.", userId);
 
-            /* Попробовать с сортировкой findAllSort */
-            return itemRepository.findAll()
+            return itemRepository.findAllByOwnerOrderByIdAsc(userId)
                     .stream()
-                    .filter(item -> item.getOwner() == userId)
-                    .sorted(Comparator.comparingLong(Item::getId))
                     .map(itemMapper::itemToDto)
                     .collect(Collectors.toList());
+
         } else {
             log.debug("Get /items/text={} request was received. Get all items with query and ownerId {}.", query, userId);
             String lowerQuery = query.toLowerCase();
@@ -67,11 +64,10 @@ public class ItemService {
                 return new ArrayList<>();
             }
 
-            return itemRepository.findAll()
-                    .stream()
-                    .filter(item -> item.getAvailable())
-                    .filter(item -> item.getName().toLowerCase().contains(lowerQuery)
-                            || item.getDescription().toLowerCase().contains(lowerQuery))
+            return Stream.concat(
+                            itemRepository.findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(lowerQuery).stream(),
+                            itemRepository.findAllByNameContainingIgnoreCaseAndAvailableIsTrue(lowerQuery).stream())
+                    .distinct()
                     .sorted(Comparator.comparingLong(Item::getId))
                     .map(itemMapper::itemToDto)
                     .collect(Collectors.toList());
