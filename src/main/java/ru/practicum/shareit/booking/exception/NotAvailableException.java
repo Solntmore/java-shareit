@@ -3,10 +3,10 @@ package ru.practicum.shareit.booking.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.FORBIDDEN)
-public class NotAllowedException extends RuntimeException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class NotAvailableException extends RuntimeException {
 
-    public NotAllowedException(String message) {
+    public NotAvailableException(String message) {
         super(message);
     }
 

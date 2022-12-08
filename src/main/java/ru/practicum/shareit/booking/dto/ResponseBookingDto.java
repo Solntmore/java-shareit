@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.Data;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.BookingItemDto;
 import ru.practicum.shareit.user.dto.BookingUserDto;
@@ -10,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * A DTO for the {@link Booking} entity
+ * A DTO for the {@link ru.practicum.shareit.booking.model.Booking} entity
  */
 @Data
 public class ResponseBookingDto implements Serializable {

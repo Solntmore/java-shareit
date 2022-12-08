@@ -8,4 +8,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     User patchUser(long userId, User updateUser);
 
     boolean existsByEmail(String email);
+
+    boolean existsById(long userId);
 }

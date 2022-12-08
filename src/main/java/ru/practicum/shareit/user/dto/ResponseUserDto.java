@@ -1,25 +1,26 @@
 package ru.practicum.shareit.user.dto;
 
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.io.Serializable;
 
+/**
+ * A DTO for the {@link ru.practicum.shareit.user.model.User} entity
+ */
 @Data
-@AllArgsConstructor
-public class ResponseUserDto {
+public class ResponseUserDto implements Serializable {
 
     @Positive
-    private long id;
+    private final Long id;
 
     @NotBlank(message = "Name may not be blank")
-    private String name;
+    private final String name;
 
     @Email(message = "Enter the correct email.")
     @NotNull(message = "Email can`t be null.")
-    private String email;
+    private final String email;
 }

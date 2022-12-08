@@ -1,38 +1,40 @@
 package ru.practicum.shareit.booking.mapper;
 
 import org.mapstruct.*;
+import ru.practicum.shareit.booking.dto.ItemBookingDto;
 import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.dto.ResponseBookingDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {ItemMapper.class, UserMapper.class})
 public interface BookingMapper {
-
-    Booking responseBookingDtoToBooking(ResponseBookingDto responseBookingDto);
+    Booking toEntityFromResponseBookingDto(ResponseBookingDto responseBookingDto);
 
     ResponseBookingDto bookingToResponseBookingDto(Booking booking);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Booking updateBookingFromResponseBookingDto(ResponseBookingDto responseBookingDto, @MappingTarget Booking booking);
+    Booking partialUpdate(ResponseBookingDto responseBookingDto, @MappingTarget Booking booking);
 
+    @Mapping(source = "bookerId", target = "booker.id")
     @Mapping(source = "itemId", target = "item.id")
     Booking requestBookingDtoToBooking(RequestBookingDto requestBookingDto);
 
-    @Mapping(source = "item.id", target = "itemId")
-    RequestBookingDto bookingToRequestBookingDto(Booking booking);
+    @InheritInverseConfiguration(name = "requestBookingDtoToBooking")
+    RequestBookingDto toDto1(Booking booking);
 
-    @Mapping(source = "itemId", target = "item.id")
+    @InheritConfiguration(name = "requestBookingDtoToBooking")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Booking updateBookingFromRequestBookingDto(RequestBookingDto requestBookingDto, @MappingTarget Booking booking);
+    Booking partialUpdate1(RequestBookingDto requestBookingDto, @MappingTarget Booking booking);
 
-    @Mapping(source = "itemId", target = "item.id")
     @Mapping(source = "bookerId", target = "booker.id")
-    Booking requestBookingDtoToBooking1(RequestBookingDto requestBookingDto);
+    Booking toEntity(ItemBookingDto itemBookingDto);
 
-    @InheritInverseConfiguration(name = "requestBookingDtoToBooking1")
-    RequestBookingDto bookingToRequestBookingDto1(Booking booking);
+    @Mapping(source = "booker.id", target = "bookerId")
+    ItemBookingDto bookingToItemBookingDto(Booking booking);
 
-    @InheritConfiguration(name = "requestBookingDtoToBooking1")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Booking updateBookingFromRequestBookingDto1(RequestBookingDto requestBookingDto, @MappingTarget Booking booking);
+    @Mapping(source = "bookerId", target = "booker.id")
+    Booking partialUpdate2(ItemBookingDto itemBookingDto, @MappingTarget Booking booking);
 }

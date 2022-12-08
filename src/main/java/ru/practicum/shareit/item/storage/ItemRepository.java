@@ -9,12 +9,14 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 
     Item setOwner(Item item, long ownerId);
 
-    Item patchItem(Item newItem, long itemId, long userId);
+    Item patchItem(Item newItem, long itemId, long ownerId);
 
     List<Item> findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(String text);
 
     List<Item> findAllByNameContainingIgnoreCaseAndAvailableIsTrue(String text);
 
     List<Item> findAllByOwnerOrderByIdAsc(long id);
+    long countAllByOwnerOrderById(long ownerId);
 
+    boolean existsById(long id);
 }

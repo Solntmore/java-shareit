@@ -1,21 +1,23 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
+/**
+ * A DTO for the {@link ru.practicum.shareit.item.model.Item} entity
+ */
 @Data
-@AllArgsConstructor
-public class RequestItemDto {
+public class RequestItemDto implements Serializable {
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String description;
+    private final String description;
 
     @NotNull
-    private Boolean available;
+    private final Boolean available;
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.RequestUserDto;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
-import ru.practicum.shareit.user.mapper.UserMapperImpl;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -21,13 +21,11 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserMapperImpl userMapper;
+    private final UserMapper userMapper;
 
-    /* Выяснил, что Dto нужна не только на выход, но и на вход. Преобразование и из Dto в User,
-    и из User в Dto правильно делать в сервисе? Кажется, как будто получается нагромождение */
     public ResponseUserDto createUser(RequestUserDto requestUserDto) {
 
-        return userMapper.userToDto(
+        return userMapper.userToResponseUserDto(
                 userRepository.save(
                         userMapper.requestDtoToUser(requestUserDto)));
     }
@@ -36,12 +34,12 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
 
-        return userMapper.userToDto(user);
+        return userMapper.userToResponseUserDto(user);
     }
 
     public ResponseUserDto updateUser(long userId, RequestUserDto updateUser) {
 
-        return userMapper.userToDto(
+        return userMapper.userToResponseUserDto(
                 userRepository.patchUser(userId, userMapper.requestDtoToUser(updateUser)));
     }
 
@@ -53,7 +51,7 @@ public class UserService {
 
         return userRepository.findAll()
                 .stream().sorted(Comparator.comparingLong(User::getId))
-                .map(userMapper::userToDto)
+                .map(userMapper::userToResponseUserDto)
                 .collect(Collectors.toList());
         /*
         Попробовать альтернативу с findAllSort()
