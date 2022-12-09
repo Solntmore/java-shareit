@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.user.exceptions.UniquenessEmailException;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.Email;
 import java.util.Optional;
 
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -24,7 +23,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
         if (optionalEmail.isPresent()) {
 
-            @Email
             String email = optionalEmail.get();
             setEmailIfEmailNotExist(email, user);
         }

@@ -50,7 +50,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseCommentDto addCommentToItem(@RequestHeader(X_SHADER_USER_ID) long userId,
-                                               @RequestBody RequestCommentDto requestCommentDto,
+                                               @RequestBody @Valid RequestCommentDto requestCommentDto,
                                                @PathVariable long itemId) {
         log.debug("A Post/items/{}/comment request was received. Post comment on item {} with from user {}.",
                 itemId, itemId, userId);

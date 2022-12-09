@@ -10,8 +10,12 @@ import java.time.LocalDateTime;
  */
 @Data
 public class ResponseCommentDto implements Serializable {
+
     private final Long id;
+
     private final String text;
+
     private final String authorName;
+
     private final LocalDateTime created;
 }

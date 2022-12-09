@@ -28,14 +28,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BookingServise {
-    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     private final BookingRepository bookingRepository;
 
     private final BookingMapper bookingMapper;
 
+    private final UserRepository userRepository;
+
     public ResponseBookingDto createBooking(RequestBookingDto requestBookingDto, long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
 
         long itemId = requestBookingDto.getItemId();
         Item item = itemRepository.findById(itemId)
@@ -57,14 +60,9 @@ public class BookingServise {
         throw new BookingNotFoundException("Item`s owner and booker can`t be one person");
     }
 
-    public ResponseBookingDto findBookingById(long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(()
-                -> new BookingNotFoundException("Booking with bookingId " + bookingId + " is not registered."));
-
-        return bookingMapper.bookingToResponseBookingDto(booking);
-    }
-
     public ResponseBookingDto patchStatusOfBooking(long bookingId, boolean approve, long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(()
                 -> new BookingNotFoundException("Booking with bookingId " + bookingId + " is not registered."));
 
@@ -80,7 +78,10 @@ public class BookingServise {
     }
 
     public ResponseBookingDto getInfoOfBooking(long bookingId, long userId) {
-        Booking booking = bookingRepository.findById(bookingId).get();
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(()
+                -> new BookingNotFoundException("Booking with bookingId " + bookingId + " is not registered."));
 
         if (booking.getBooker().getId() == userId) {
             return bookingMapper.bookingToResponseBookingDto(booking);
@@ -94,6 +95,10 @@ public class BookingServise {
     }
 
     public List<ResponseBookingDto> getAllBookingsOfUser(RequestState state, long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+        LocalDateTime localDateTime = LocalDateTime.now();
+
         switch (state) {
             case ALL:
                 return bookingRepository.findAllByBookerIdOrderByIdAsc(userId)
@@ -101,12 +106,12 @@ public class BookingServise {
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findBookingsInPastByBookerIdOrderByIdAsc(LocalDateTime.now(), userId)
+                return bookingRepository.findBookingsInPastByBookerIdOrderByIdAsc(localDateTime, userId)
                         .stream()
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findBookingsInFutureByBookerIdOrderByIdAsc(LocalDateTime.now(), userId)
+                return bookingRepository.findBookingsInFutureByBookerIdOrderByIdAsc(localDateTime, userId)
                         .stream()
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());
@@ -120,13 +125,24 @@ public class BookingServise {
                         .stream()
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());
+            case CURRENT:
+                return bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById
+                                (userId, localDateTime, localDateTime)
+                        .stream()
+                        .map(bookingMapper::bookingToResponseBookingDto)
+                        .collect(Collectors.toList());
             default:
                 throw new InvalidStatusException("Unknown state: " + state.name());
         }
     }
 
     public List<ResponseBookingDto> getAllBookingsForUsersItems(RequestState state, long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+
         if (itemRepository.countAllByOwnerOrderById(userId) > 0) {
+            LocalDateTime localDateTime = LocalDateTime.now();
+
             switch (state) {
                 case ALL:
                     return bookingRepository.findBookingsForOwnerItems(userId)
@@ -134,12 +150,12 @@ public class BookingServise {
                             .map(bookingMapper::bookingToResponseBookingDto)
                             .collect(Collectors.toList());
                 case PAST:
-                    return bookingRepository.findBookingsInPastForOwnerItems(LocalDateTime.now(), userId)
+                    return bookingRepository.findBookingsInPastForOwnerItems(localDateTime, userId)
                             .stream()
                             .map(bookingMapper::bookingToResponseBookingDto)
                             .collect(Collectors.toList());
                 case FUTURE:
-                    return bookingRepository.findBookingsInFutureForOwnerItems(LocalDateTime.now(), userId)
+                    return bookingRepository.findBookingsInFutureForOwnerItems(localDateTime, userId)
                             .stream()
                             .map(bookingMapper::bookingToResponseBookingDto)
                             .collect(Collectors.toList());
@@ -150,6 +166,11 @@ public class BookingServise {
                             .collect(Collectors.toList());
                 case REJECTED:
                     return bookingRepository.findBookingsByStatusAndForOwnerItems(Status.REJECTED, userId)
+                            .stream()
+                            .map(bookingMapper::bookingToResponseBookingDto)
+                            .collect(Collectors.toList());
+                case CURRENT:
+                    return bookingRepository.findCurrentBookingsForOwnerItems(localDateTime, userId)
                             .stream()
                             .map(bookingMapper::bookingToResponseBookingDto)
                             .collect(Collectors.toList());

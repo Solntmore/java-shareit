@@ -38,13 +38,18 @@ public class UserService {
     }
 
     public ResponseUserDto updateUser(long userId, RequestUserDto updateUser) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
 
         return userMapper.userToResponseUserDto(
                 userRepository.patchUser(userId, userMapper.requestDtoToUser(updateUser)));
     }
 
-    public void deleteUserById(long id) {
-        userRepository.deleteById(id);
+    public void deleteUserById(long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+
+        userRepository.deleteById(userId);
     }
 
     public List<ResponseUserDto> findAllUsers() {
@@ -53,8 +58,5 @@ public class UserService {
                 .stream().sorted(Comparator.comparingLong(User::getId))
                 .map(userMapper::userToResponseUserDto)
                 .collect(Collectors.toList());
-        /*
-        Попробовать альтернативу с findAllSort()
-         */
     }
 }

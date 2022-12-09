@@ -14,7 +14,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
 
     Booking findFirstByItem_IdAndStartIsAfterOrderByStartAsc(long itemId, LocalDateTime localDateTime);
 
-    Booking findFirstByItem_IdAndBooker_IdAndEndIsBefore(Long itemId, Long userId, LocalDateTime localDateTime);
+    boolean existsBookingByItem_IdAndBooker_IdAndEndIsBefore(long itemId, long userId, LocalDateTime localDateTime);
 
     @Query("SELECT b FROM Booking b WHERE b.booker = (SELECT u FROM User u WHERE u.id = ?1) ORDER BY b.id DESC")
     List<Booking> findAllByBookerIdOrderByIdAsc(long bookerId);
@@ -29,15 +29,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
 
     List<Booking> findAllByStatusAndBooker_IdOrderByIdDesc(Status status, long bookerId);
 
+    List<Booking> findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById(long bookerId, LocalDateTime localDateTime,
+                                                                           LocalDateTime localDateTime2);
+
     @Query("SELECT b FROM Booking b LEFT JOIN Item i ON b.item = i WHERE i.owner = ?2 AND b.status = ?1 ORDER BY b.id DESC")
-    List<Booking> findBookingsByStatusAndForOwnerItems(Status status, long bookerId);
+    List<Booking> findBookingsByStatusAndForOwnerItems(Status status, long ownerId);
 
     @Query("SELECT b FROM Booking b LEFT JOIN Item i ON b.item = i WHERE i.owner = ?1 ORDER BY b.id DESC")
-    List<Booking> findBookingsForOwnerItems(long bookerId);
+    List<Booking> findBookingsForOwnerItems(long ownerId);
 
     @Query("SELECT b FROM Booking b LEFT JOIN Item i ON b.item = i WHERE i.owner = ?2 AND b.start > ?1 ORDER BY b.id DESC")
-    List<Booking> findBookingsInFutureForOwnerItems(LocalDateTime localDateTime, long bookerId);
+    List<Booking> findBookingsInFutureForOwnerItems(LocalDateTime localDateTime, long ownerId);
+
+    @Query("SELECT b FROM Booking b LEFT JOIN Item i ON b.item = i " +
+            "WHERE i.owner = ?2 AND b.start < ?1 AND b.end >?1 ORDER BY b.id DESC")
+    List<Booking> findCurrentBookingsForOwnerItems(LocalDateTime localDateTime, long ownerId);
 
     @Query("SELECT b FROM Booking b LEFT JOIN Item i ON b.item = i WHERE i.owner = ?2 AND b.end < ?1 ORDER BY b.id DESC")
-    List<Booking> findBookingsInPastForOwnerItems(LocalDateTime localDateTime, long bookerId);
+    List<Booking> findBookingsInPastForOwnerItems(LocalDateTime localDateTime, long ownerId);
 }

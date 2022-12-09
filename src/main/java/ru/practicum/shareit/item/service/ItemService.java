@@ -53,6 +53,7 @@ public class ItemService {
 
     public ResponseItemDto updateItem(RequestItemDto newItem, long itemId, long userId) {
         if (itemRepository.existsById(itemId) && userRepository.existsById(userId)) {
+
             return itemMapper.itemToResponseItemDto(
                     itemRepository.patchItem(
                             itemMapper.requestItemDtoToItem(newItem), itemId, userId));
@@ -65,14 +66,16 @@ public class ItemService {
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
+
         ResponseItemDto responseItemDto = itemMapper.itemToResponseItemDto(item);
+        ArrayList<ResponseCommentDto> comments = commentRepository.findAllByItem_IdOrderById(itemId);
+        responseItemDto.setComments(comments);
 
         if (item.getOwner() != userId) {
-            return checkAndSetCommentsForItem(responseItemDto);
+            return responseItemDto;
         }
 
-        return checkAndSetCommentsForItem(
-                setLastAndNextBooking(itemId, responseItemDto));
+        return setLastAndNextBooking(itemId, responseItemDto);
     }
 
     public List<ResponseItemDto> findAllItemsWithParameters(long userId, String query) {
@@ -111,25 +114,16 @@ public class ItemService {
                 .orElseThrow(() -> new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
 
         if (bookingRepository
-                .findFirstByItem_IdAndBooker_IdAndEndIsBefore(itemId, userId, LocalDateTime.now()) != null) {
+                .existsBookingByItem_IdAndBooker_IdAndEndIsBefore(itemId, userId, LocalDateTime.now())) {
 
             Comment comment = commentMapper.requestCommentDtoToComment(requestCommentDto);
             comment.setItem(item);
             comment.setAuthor(user);
+            comment.setCreated(LocalDateTime.now());
 
             return commentMapper.commentToResponseCommentDto(commentRepository.save(comment));
         }
         throw new NoBookingInPastException("You can`t add comment with 0 finished bookings");
-    }
-
-    private ResponseItemDto checkAndSetCommentsForItem(ResponseItemDto responseItemDto) {
-
-        if (responseItemDto.getComments() == null) {
-            ArrayList<ResponseCommentDto> comments = new ArrayList<>();
-            responseItemDto.setComments(comments);
-        }
-
-        return responseItemDto;
     }
 
     private ResponseItemDto setLastAndNextBooking(long itemId, ResponseItemDto responseItemDto) {

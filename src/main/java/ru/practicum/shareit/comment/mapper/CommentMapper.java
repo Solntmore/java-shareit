@@ -7,23 +7,20 @@ import ru.practicum.shareit.comment.model.Comment;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface CommentMapper {
-    @Mapping(source = "authorId", target = "author.id")
-    Comment requestCommentDtoToComment(RequestCommentDto requestCommentDto);
-
-    @Mapping(source = "author.id", target = "authorId")
-    RequestCommentDto toDto(Comment comment);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "authorId", target = "author.id")
-    Comment partialUpdate(RequestCommentDto requestCommentDto, @MappingTarget Comment comment);
-
     @Mapping(source = "authorName", target = "author.name")
-    Comment toEntity1(ResponseCommentDto responseCommentDto);
+    Comment toEntity(ResponseCommentDto responseCommentDto);
 
     @Mapping(source = "author.name", target = "authorName")
     ResponseCommentDto commentToResponseCommentDto(Comment comment);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "authorName", target = "author.name")
-    Comment partialUpdate1(ResponseCommentDto responseCommentDto, @MappingTarget Comment comment);
+    Comment partialUpdate(ResponseCommentDto responseCommentDto, @MappingTarget Comment comment);
+
+    Comment requestCommentDtoToComment(RequestCommentDto requestCommentDto);
+
+    RequestCommentDto toDto1(Comment comment);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Comment partialUpdate1(RequestCommentDto requestCommentDto, @MappingTarget Comment comment);
 }

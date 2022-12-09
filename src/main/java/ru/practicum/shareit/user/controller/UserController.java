@@ -46,7 +46,6 @@ public class UserController {
     @PatchMapping("/{userId}")
     public ResponseUserDto updateUser(@PathVariable long userId, @RequestBody RequestUserDto updateUser) {
         log.debug("Patch /users request was received. Update user {}.", userId);
-        userService.findUserById(userId);
 
         return userService.updateUser(userId, updateUser);
     }
@@ -54,7 +53,7 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable long userId) {
         log.debug("The Delete /users/{} request was received. Delete a user by user Id {}.", userId, userId);
-        userService.findUserById(userId);
+
         userService.deleteUserById(userId);
     }
 
