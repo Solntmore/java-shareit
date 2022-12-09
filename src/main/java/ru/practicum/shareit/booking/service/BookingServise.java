@@ -126,8 +126,8 @@ public class BookingServise {
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());
             case CURRENT:
-                return bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById
-                                (userId, localDateTime, localDateTime)
+                return bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById(userId, localDateTime,
+                                localDateTime)
                         .stream()
                         .map(bookingMapper::bookingToResponseBookingDto)
                         .collect(Collectors.toList());

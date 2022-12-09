@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.shareit.booking.exception.InvalidStateException;
 import ru.practicum.shareit.booking.model.ErrorResponse;
 
 @RestControllerAdvice("ru.practicum.shareit")

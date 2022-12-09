@@ -19,10 +19,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length=512, nullable = false)
+    @Column(name = "name", length = 512, nullable = false)
     private String name;
 
-    @Column(name = "description", length=512, nullable = false)
+    @Column(name = "description", length = 512, nullable = false)
     private String description;
 
     @Column(name = "is_available", nullable = false)
@@ -30,9 +30,7 @@ public class Item {
 
     @Column(name = "owner_id")
     private long owner;
-/*
-    private Long request;
-*/
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

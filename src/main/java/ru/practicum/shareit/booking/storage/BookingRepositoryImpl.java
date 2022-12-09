@@ -4,14 +4,10 @@ import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.booking.exception.ForbiddenBookerException;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BookingRepositoryImpl implements BookingRepositoryCustom {
 

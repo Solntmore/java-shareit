@@ -33,11 +33,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         Optional<String> optionalDescription = Optional.ofNullable(newItem.getDescription());
         Optional<Boolean> optionalAvailable = Optional.ofNullable(newItem.getAvailable());
 
-        if (IsPresentAndNotBlank(optionalName)) {
+        if (isPresentAndNotBlank(optionalName)) {
             oldItem.setName(optionalName.get());
         }
 
-        if (IsPresentAndNotBlank(optionalDescription)) {
+        if (isPresentAndNotBlank(optionalDescription)) {
             oldItem.setDescription(optionalDescription.get());
         }
 
@@ -50,7 +50,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         return oldItem;
     }
 
-    private boolean IsPresentAndNotBlank(Optional<String> optionalLine) {
+    private boolean isPresentAndNotBlank(Optional<String> optionalLine) {
         if (optionalLine.isPresent()) {
             String line = optionalLine.get();
             if (line.isBlank()) {
