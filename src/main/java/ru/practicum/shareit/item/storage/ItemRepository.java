@@ -16,6 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
     List<Item> findAllByNameContainingIgnoreCaseAndAvailableIsTrue(String text);
 
     List<Item> findAllByOwnerOrderByIdAsc(long id);
+
     long countAllByOwnerOrderById(long ownerId);
 
     boolean existsById(long id);

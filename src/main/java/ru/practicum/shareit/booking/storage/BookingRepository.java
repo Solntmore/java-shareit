@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long>, BookingRepositoryCustom {
     Booking patchStatusOfBooking(long bookingId, boolean approve, long userId);
+
     Booking findFirstByItem_IdAndEndIsBeforeOrderByEndDesc(long itemId, LocalDateTime localDateTime);
 
     Booking findFirstByItem_IdAndStartIsAfterOrderByStartAsc(long itemId, LocalDateTime localDateTime);
