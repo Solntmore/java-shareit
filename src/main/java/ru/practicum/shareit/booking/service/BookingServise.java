@@ -44,21 +44,25 @@ public class BookingServise {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Item with itemId " + itemId + " is not registered."));
 
-        if (item.getOwner() != userId) {
-            if (requestBookingDto.getEnd().isAfter(requestBookingDto.getStart())) {
-                if (item.getAvailable()) {
-                    requestBookingDto.setBookerId(userId);
-                    Booking booking = bookingMapper.requestBookingDtoToBooking(requestBookingDto);
-                    booking.setItem(item);
+        if (item.getOwner() == userId) {
+            throw new BookingNotFoundException("Item`s owner and booker can`t be one person");
+        }
 
-                    return bookingMapper.bookingToResponseBookingDto(bookingRepository.save(booking));
-                }
-                throw new NotAvailableException("Item with itemId " + itemId + " is not available.");
-            }
+        if (requestBookingDto.getEnd().isBefore(requestBookingDto.getStart())) {
             throw new WrongTimeException("End time should be after start time");
         }
-        throw new BookingNotFoundException("Item`s owner and booker can`t be one person");
+
+        if (!item.getAvailable()) {
+            throw new NotAvailableException("Item with itemId " + itemId + " is not available.");
+        }
+
+        requestBookingDto.setBookerId(userId);
+        Booking booking = bookingMapper.requestBookingDtoToBooking(requestBookingDto);
+        booking.setItem(item);
+
+        return bookingMapper.bookingToResponseBookingDto(bookingRepository.save(booking));
     }
+
 
     public ResponseBookingDto patchStatusOfBooking(long bookingId, boolean approve, long userId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -97,40 +101,27 @@ public class BookingServise {
     public List<ResponseBookingDto> getAllBookingsOfUser(RequestState state, long userId) {
         userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         switch (state) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByIdAsc(userId)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findAllByBookerIdOrderByIdAsc(userId));
             case PAST:
-                return bookingRepository.findBookingsInPastByBookerIdOrderByIdAsc(localDateTime, userId)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsInPastByBookerIdOrderByIdAsc(now, userId));
             case FUTURE:
-                return bookingRepository.findBookingsInFutureByBookerIdOrderByIdAsc(localDateTime, userId)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsInFutureByBookerIdOrderByIdAsc(now, userId));
             case WAITING:
-                return bookingRepository.findAllByStatusAndBooker_IdOrderByIdDesc(Status.WAITING, userId)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findAllByStatusAndBooker_IdOrderByIdDesc(Status.WAITING, userId));
             case REJECTED:
-                return bookingRepository.findAllByStatusAndBooker_IdOrderByIdDesc(Status.REJECTED, userId)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findAllByStatusAndBooker_IdOrderByIdDesc(Status.REJECTED, userId));
             case CURRENT:
-                return bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById(userId, localDateTime,
-                                localDateTime)
-                        .stream()
-                        .map(bookingMapper::bookingToResponseBookingDto)
-                        .collect(Collectors.toList());
+                return convertToResponseBookingDto(
+                        bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderById(userId, now, now));
             default:
                 throw new InvalidStatusException("Unknown state: " + state.name());
         }
@@ -140,45 +131,39 @@ public class BookingServise {
         userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
 
-        if (itemRepository.countAllByOwnerOrderById(userId) > 0) {
-            LocalDateTime localDateTime = LocalDateTime.now();
-
-            switch (state) {
-                case ALL:
-                    return bookingRepository.findBookingsForOwnerItems(userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                case PAST:
-                    return bookingRepository.findBookingsInPastForOwnerItems(localDateTime, userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                case FUTURE:
-                    return bookingRepository.findBookingsInFutureForOwnerItems(localDateTime, userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                case WAITING:
-                    return bookingRepository.findBookingsByStatusAndForOwnerItems(Status.WAITING, userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                case REJECTED:
-                    return bookingRepository.findBookingsByStatusAndForOwnerItems(Status.REJECTED, userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                case CURRENT:
-                    return bookingRepository.findCurrentBookingsForOwnerItems(localDateTime, userId)
-                            .stream()
-                            .map(bookingMapper::bookingToResponseBookingDto)
-                            .collect(Collectors.toList());
-                default:
-                    throw new InvalidStatusException("Unknown state: " + state.name());
-            }
-        } else {
+        if (itemRepository.countAllByOwnerOrderById(userId) < 0) {
             throw new ItemNotFoundException("User with id " + userId + "haven`t items");
         }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        switch (state) {
+            case ALL:
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsForOwnerItems(userId));
+            case PAST:
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsInPastForOwnerItems(now, userId));
+            case FUTURE:
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsInFutureForOwnerItems(now, userId));
+            case WAITING:
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsByStatusAndForOwnerItems(Status.WAITING, userId));
+            case REJECTED:
+                return convertToResponseBookingDto(
+                        bookingRepository.findBookingsByStatusAndForOwnerItems(Status.REJECTED, userId));
+            case CURRENT:
+                return convertToResponseBookingDto(
+                        bookingRepository.findCurrentBookingsForOwnerItems(now, userId));
+            default:
+                throw new InvalidStatusException("Unknown state: " + state.name());
+        }
+    }
+
+    List<ResponseBookingDto> convertToResponseBookingDto(List<Booking> list) {
+        return list.stream()
+                .map(bookingMapper::bookingToResponseBookingDto)
+                .collect(Collectors.toList());
     }
 }

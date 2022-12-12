@@ -35,11 +35,11 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public ResponseBookingDto patchStatusOfBooking(@RequestHeader(X_SHADER_USER_ID) long userId,
                                                    @PathVariable long bookingId,
-                                                   @RequestParam(name = "approved") boolean approve) {
+                                                   @RequestParam boolean approved) {
         log.debug("A Patch/bookings/{}?approved={} request was received. Approve booking with owner id {}.",
-                bookingId, approve, userId);
+                bookingId, approved, userId);
 
-        return bookingServise.patchStatusOfBooking(bookingId, approve, userId);
+        return bookingServise.patchStatusOfBooking(bookingId, approved, userId);
     }
 
     @GetMapping("/{bookingId}")
@@ -53,8 +53,8 @@ public class BookingController {
 
     @GetMapping
     public List<ResponseBookingDto> getAllBookingsOfUser(@RequestHeader(X_SHADER_USER_ID) long userId,
-                                                         @RequestParam(required = false, name = "state",
-                                                                 defaultValue = "ALL") RequestState state) {
+                                                         @RequestParam(required = false, defaultValue = "ALL")
+                                                         RequestState state) {
         log.debug("A Get/bookings?state={} request was received. Get information of  user`s {} bookings with state {}.",
                 state.name(), userId, state.name());
 
@@ -63,8 +63,8 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<ResponseBookingDto> getAllBookingsForUsersItems(@RequestHeader(X_SHADER_USER_ID) long userId,
-                                                                @RequestParam(required = false, name = "state",
-                                                                        defaultValue = "ALL") RequestState state) {
+                                                                @RequestParam(required = false, defaultValue = "ALL")
+                                                                RequestState state) {
         log.debug("A Get/bookings?state={} request was received. Get information of  user`s {} bookings with state {}.",
                 state.name(), userId, state.name());
 
