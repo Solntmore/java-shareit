@@ -1,12 +1,12 @@
-package ru.practicum.shareit.user.exceptions;
+package ru.practicum.shareit.booking.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.CONFLICT)
-public class InvalidEmailException extends RuntimeException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class WrongTimeException extends RuntimeException {
 
-    public InvalidEmailException(String message) {
+    public WrongTimeException(String message) {
         super(message);
     }
 

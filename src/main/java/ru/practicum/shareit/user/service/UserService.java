@@ -3,11 +3,12 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.RequestUserDto;
+import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
-import ru.practicum.shareit.user.mapper.UserMapperImpl;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,31 +20,43 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
-    private final UserMapperImpl userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserDto createUser(User user) {
-        return userMapper.userToDto(userStorage.createUser(user));
+    public ResponseUserDto createUser(RequestUserDto requestUserDto) {
+
+        return userMapper.userToResponseUserDto(
+                userRepository.save(
+                        userMapper.requestDtoToUser(requestUserDto)));
     }
 
-    public UserDto findUserById(long userId) {
-        User user = userStorage.findUserById(userId).orElseThrow(() ->
+    public ResponseUserDto findUserById(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
-        return userMapper.userToDto(user);
+
+        return userMapper.userToResponseUserDto(user);
     }
 
-    public UserDto updateUser(long userId, User updateUser) {
-        return userMapper.userToDto(userStorage.updateUser(userId, updateUser));
+    public ResponseUserDto updateUser(long userId, RequestUserDto updateUser) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+
+        return userMapper.userToResponseUserDto(
+                userRepository.patchUser(userId, userMapper.requestDtoToUser(updateUser)));
     }
 
-    public void deleteUserById(long id) {
-        userStorage.deleteUserById(id);
+    public void deleteUserById(long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
+
+        userRepository.deleteById(userId);
     }
 
-    public List<UserDto> findAllUsers() {
-        return userStorage.findAllUsers()
+    public List<ResponseUserDto> findAllUsers() {
+
+        return userRepository.findAll()
                 .stream().sorted(Comparator.comparingLong(User::getId))
-                .map(userMapper::userToDto)
+                .map(userMapper::userToResponseUserDto)
                 .collect(Collectors.toList());
     }
 }
