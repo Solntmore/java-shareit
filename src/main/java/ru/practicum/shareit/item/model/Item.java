@@ -31,6 +31,9 @@ public class Item {
     @Column(name = "owner_id")
     private long owner;
 
+    @Column(name = "request_id")
+    private long requestId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

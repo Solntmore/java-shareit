@@ -4,6 +4,7 @@ import org.mapstruct.*;
 import ru.practicum.shareit.item.dto.BookingItemDto;
 import ru.practicum.shareit.item.dto.RequestItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
+import ru.practicum.shareit.item.dto.ResponseItemForRequestDto;
 import ru.practicum.shareit.item.model.Item;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
@@ -28,4 +29,11 @@ public interface ItemMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Item partialUpdate2(BookingItemDto bookingItemDto, @MappingTarget Item item);
+
+    Item toEntity1(ResponseItemForRequestDto responseItemForRequestDto);
+
+    ResponseItemForRequestDto itemToResponseItemForRequestDto(Item item);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Item partialUpdate3(ResponseItemForRequestDto responseItemForRequestDto, @MappingTarget Item item);
 }

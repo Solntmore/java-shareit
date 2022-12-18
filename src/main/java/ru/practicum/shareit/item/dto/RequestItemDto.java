@@ -20,4 +20,6 @@ public class RequestItemDto implements Serializable {
 
     @NotNull
     private final Boolean available;
+
+    private final long requestId;
 }
