@@ -164,7 +164,7 @@ public class BookingServise {
         }
     }
 
-    List<ResponseBookingDto> convertToResponseBookingDto(Page<Booking> list) {
+    private List<ResponseBookingDto> convertToResponseBookingDto(Page<Booking> list) {
         return list.getContent()
                 .stream()
                 .map(bookingMapper::bookingToResponseBookingDto)

@@ -83,7 +83,7 @@ public class RequestService {
         return setItems(responseRequestDto);
     }
 
-    List<ResponseRequestDto> convertToResponseRequestDto(List<Request> list) {
+    private List<ResponseRequestDto> convertToResponseRequestDto(List<Request> list) {
         return list.stream()
                 .map(requestMapper::fromItemRequestToResponseItemRequestDto)
                 .map(this::setItems)
