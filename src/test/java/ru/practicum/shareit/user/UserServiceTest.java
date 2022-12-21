@@ -17,6 +17,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestUserDto;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -102,13 +103,4 @@ public class UserServiceTest {
 
     }
 
-
-
-    private RequestUserDto makeRequestUserDto(String name, String email) {
-        RequestUserDto dto = new RequestUserDto();
-        dto.setName(name);
-        dto.setEmail(email);
-
-        return dto;
-    }
 }

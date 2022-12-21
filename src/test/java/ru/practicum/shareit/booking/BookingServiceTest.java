@@ -26,6 +26,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static ru.practicum.shareit.StaticMethodsAndStringsForTests.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -346,33 +347,5 @@ public class BookingServiceTest {
         assertThat(bookingList.get(1).getId(), equalTo(responseBookingDto2.getId()));
         assertThat(bookingList.get(0).getItem().getName(), equalTo(responseBookingDto3.getItem().getName()));
         assertThat(bookingList.get(1).getItem().getName(), equalTo(responseBookingDto2.getItem().getName()));
-    }
-
-    private RequestUserDto makeRequestUserDto(String name, String email) {
-        RequestUserDto dto = new RequestUserDto();
-        dto.setName(name);
-        dto.setEmail(email);
-
-        return dto;
-    }
-
-    private RequestItemDto makeRequestItemDto(String name, String description, Boolean available, long requestId) {
-        RequestItemDto dto = new RequestItemDto();
-        dto.setName(name);
-        dto.setDescription(description);
-        dto.setAvailable(available);
-        dto.setRequestId(requestId);
-
-        return dto;
-    }
-
-    private RequestBookingDto makeRequestBookingDto(LocalDateTime start, LocalDateTime end, Long itemId, Long bookerId) {
-        RequestBookingDto dto = new RequestBookingDto();
-        dto.setStart(start);
-        dto.setEnd(end);
-        dto.setItemId(itemId);
-        dto.setBookerId(bookerId);
-
-        return dto;
     }
 }

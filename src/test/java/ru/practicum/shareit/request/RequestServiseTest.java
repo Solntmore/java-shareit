@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.shareit.item.dto.RequestItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -22,6 +21,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestItemDto;
+import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestRequestDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -150,23 +151,6 @@ public class RequestServiseTest {
         RequestUserDto dto = new RequestUserDto();
         dto.setName(name);
         dto.setEmail(email);
-
-        return dto;
-    }
-
-    private RequestRequestDto makeRequestRequestDto(String description) {
-        RequestRequestDto dto = new RequestRequestDto();
-        dto.setDescription(description);
-
-        return dto;
-    }
-
-    private RequestItemDto makeRequestItemDto(String name, String description, Boolean available, long requestId) {
-        RequestItemDto dto = new RequestItemDto();
-        dto.setName(name);
-        dto.setDescription(description);
-        dto.setAvailable(available);
-        dto.setRequestId(requestId);
 
         return dto;
     }
