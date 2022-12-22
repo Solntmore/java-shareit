@@ -21,8 +21,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestItemDto;
-import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestRequestDto;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestItemDto;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestRequestDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase

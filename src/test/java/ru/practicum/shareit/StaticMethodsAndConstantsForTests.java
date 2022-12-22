@@ -8,12 +8,35 @@ import ru.practicum.shareit.user.dto.RequestUserDto;
 
 import java.time.LocalDateTime;
 
-public class StaticMethodsAndStringsForTests {
+public class StaticMethodsAndConstantsForTests {
 
     public static final String RESET_IDS = "alter table users alter column id restart with 1;" +
             "alter table items alter column id restart with 1;" +
             "alter table requests alter column id restart with 1;" +
-            "alter table bookings alter column id restart with 1;";
+            "alter table bookings alter column id restart with 1;" +
+            "alter table comments alter column id restart with 1;";
+
+    public static final String CREATE_USERS = "INSERT INTO users (email, name) " +
+            "VALUES ('Олег', 'bolshakov2022@yandex.ru'), " +
+            "       ('Максим', 'konovalov1992@yandex.ru'), " +
+            "       ('Ева', 'eva2017@yandex.ru');";
+
+    public static final String CREATE_ITEMS = "INSERT INTO items (is_available, description, name, owner_id, request_id) " +
+            "VALUES ('true', 'Круто сверлит', 'Дрель', 1, 1), " +
+            "       ('true', 'Нормально сверлит', 'Дрель', 1, 1), " +
+            "       ('true', 'Копает землю', 'Лопата', 2, 2), " +
+            "       ('true', 'Не класть на землю', 'Грабли', 2, 3); ";
+
+    public static final String CREATE_UNAVAILABLE_ITEMS = "INSERT INTO items (is_available, description, name, owner_id, request_id) " +
+            "VALUES ('false', 'Убирает ковер', 'Пылесос', 1, 1), " +
+            "       ('false', 'Сам ездит и убирается', 'Робот пылесос', 1, 1);";
+
+    public static final String CREATE_BOOKINGS = "INSERT INTO bookings (end_date, start_date, status, booker_id, item_id) " +
+            "VALUES ('2021-11-04 06:00:00', '2021-11-05 06:00:00', 'APPROVED', 2, 2), " +
+            "       ('2022-11-04 06:00:00', '2022-11-05 06:00:00', 'WAITING', 2, 1), " +
+            "       ('2023-11-04 06:00:00', '2023-11-05 06:00:00', 'REJECTED', 2, 1), " +
+            "       ('2024-11-04 06:00:00', '2024-11-05 06:00:00', 'APPROVED', 2, 2); ";
+
     public static RequestUserDto makeRequestUserDto(String name, String email) {
         RequestUserDto dto = new RequestUserDto();
         dto.setName(name);

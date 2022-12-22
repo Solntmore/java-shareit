@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dto.RequestUserDto;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -18,11 +18,12 @@ import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ru.practicum.shareit.StaticMethodsAndStringsForTests.RESET_IDS;
-import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestUserDto;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.RESET_IDS;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestUserDto;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserControllerMockMvcIntegrationTest {
 
     private static RequestUserDto user1;
@@ -44,11 +45,6 @@ public class UserControllerMockMvcIntegrationTest {
         user3 = makeRequestUserDto("Ева", "eva2017@yandex.ru");
         userInvalidEmail = makeRequestUserDto("Олег", "bolshakovyandex.ru");
         userInvalidName = makeRequestUserDto(" ", "bolshakov2022@yandex.ru");
-    }
-
-    @AfterEach
-    public void resetDb() {
-        userRepository.deleteAll();
     }
 
     @Test
@@ -204,15 +200,15 @@ public class UserControllerMockMvcIntegrationTest {
     public void patchUserGetStatus200() throws Exception {
 
         mockMvc.perform(
-                        post("/users")
-                                .content(objectMapper.writeValueAsString(user1))
-                                .contentType(MediaType.APPLICATION_JSON)
-                );
-        mockMvc.perform(
-                patch("/users/1")
-                        .content(objectMapper.writeValueAsString(user2))
+                post("/users")
+                        .content(objectMapper.writeValueAsString(user1))
                         .contentType(MediaType.APPLICATION_JSON)
-        )
+        );
+        mockMvc.perform(
+                        patch("/users/1")
+                                .content(objectMapper.writeValueAsString(user2))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.name").value("Максим"))

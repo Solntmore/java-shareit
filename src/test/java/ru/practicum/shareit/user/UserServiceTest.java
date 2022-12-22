@@ -17,7 +17,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static ru.practicum.shareit.StaticMethodsAndStringsForTests.makeRequestUserDto;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestUserDto;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
