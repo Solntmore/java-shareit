@@ -12,34 +12,25 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.comment.dto.RequestCommentDto;
-import ru.practicum.shareit.item.dto.RequestItemDto;
+import ru.practicum.shareit.user.dto.RequestUserDto;
 
 import java.time.LocalDateTime;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
-import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.CREATE_USERS;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
 public class BookingControllerMockMvcIntegrationTest {
-    private static RequestItemDto item1;
-    private static RequestItemDto item2;
-    private static RequestItemDto itemWithInvalidName;
-    private static RequestItemDto itemWithInvalidDescription;
-    private static RequestItemDto itemWithInvalidAvailable;
-    private static RequestCommentDto comment1;
-    private static RequestCommentDto commentInvalid;
     private static RequestBookingDto booking1;
     private static RequestBookingDto booking2;
     private static RequestBookingDto bookingStartInPast;
     private static RequestBookingDto bookingStartBeforeEnd;
     private static RequestBookingDto bookingWithNotFoundItem;
+    private static RequestUserDto user1;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -48,18 +39,6 @@ public class BookingControllerMockMvcIntegrationTest {
 
     @BeforeAll
     public static void makeObjects() {
-        item1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        item2 = makeRequestItemDto("Дрель", "Нормально сверлит",
-                true, 1);
-        itemWithInvalidName = makeRequestItemDto("", "Не класть на землю",
-                true, 3);
-        itemWithInvalidDescription = makeRequestItemDto("Грабли", "",
-                true, 3);
-        itemWithInvalidAvailable = makeRequestItemDto("Грабли", "Не класть на землю",
-                null, 3);
-        comment1 = makeRequestCommentDto("Крутая вещь");
-        commentInvalid = makeRequestCommentDto("");
         booking1 = makeRequestBookingDto(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3),
                 1L, 2L);
         booking2 = makeRequestBookingDto(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3),
@@ -70,6 +49,7 @@ public class BookingControllerMockMvcIntegrationTest {
                 1L, 2L);
         bookingWithNotFoundItem = makeRequestBookingDto(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3),
                 50L, 2L);
+        user1 = makeRequestUserDto("Дмитрий Безвещевой", "noItemNoMoney@yandex.ru");
     }
 
     @Test
@@ -247,5 +227,373 @@ public class BookingControllerMockMvcIntegrationTest {
                                 .header("X-Sharer-User-Id", "1")
                 )
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Запрос всех бронирований пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(2))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].item.id").value(1))
+                .andExpect(jsonPath("$[2].id").isNumber())
+                .andExpect(jsonPath("$[2].item.id").value(1))
+                .andExpect(jsonPath("$[3].id").isNumber())
+                .andExpect(jsonPath("$[3].item.id").value(2));
+    }
+
+    @Test
+    @DisplayName("Неуспешный запрос бронирований несуществующего пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingForNotFoundUserGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings")
+                                .header("X-Sharer-User-Id", "552")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Запрос всех прошедших бронирований пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserInPastGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings?state=PAST")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("WAITING"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].start").isNotEmpty())
+                .andExpect(jsonPath("$[1].end").isNotEmpty())
+                .andExpect(jsonPath("$[1].item.id").value(2))
+                .andExpect(jsonPath("$[1].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[1].booker.id").value(2))
+                .andExpect(jsonPath("$[1].status").value("APPROVED"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех будущих бронирований пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserInFutureGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings?state=FUTURE")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(2))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].start").isNotEmpty())
+                .andExpect(jsonPath("$[1].end").isNotEmpty())
+                .andExpect(jsonPath("$[1].item.id").value(1))
+                .andExpect(jsonPath("$[1].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[1].booker.id").value(2))
+                .andExpect(jsonPath("$[1].status").value("REJECTED"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех ожидающих бронирований пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserWithStatusWaitingGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings?state=WAITING")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("WAITING"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех отклоненных бронирований пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserWithStatusRejectedGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings?state=REJECTED")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("REJECTED"));
+    }
+
+    @Test
+    @DisplayName("Неуспешный запрос всех бронирований пользователя с не валидным статусом")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getBookingOfUserWithInvalidStatusGetStatus400() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings?state=INVALID")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Запрос бронирований по вещи пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForNotFoundUsersItemsStatusGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner")
+                                .header("X-Sharer-User-Id", "552")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Запрос бронирований пользователя без вещей")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForUserWithoutItemsStatusGetStatus404() throws Exception {
+        mockMvc.perform(
+                post("/users")
+                        .content(objectMapper.writeValueAsString(user1))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                        get("/bookings/owner")
+                                .header("X-Sharer-User-Id", "4")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Неуспешный запрос всех бронирований вещей пользователя с не валидным статусом")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForUserItemsWithInvalidStatusGetStatus400() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner?state=INVALID")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Запрос всех бронирований вещей пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForUserItemsGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(2))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].item.id").value(1))
+                .andExpect(jsonPath("$[2].id").isNumber())
+                .andExpect(jsonPath("$[2].item.id").value(1))
+                .andExpect(jsonPath("$[3].id").isNumber())
+                .andExpect(jsonPath("$[3].item.id").value(2));
+    }
+
+    @Test
+    @DisplayName("Запрос всех прошедших бронирований вещей пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForUserItemsInPastGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner?state=PAST")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("WAITING"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].start").isNotEmpty())
+                .andExpect(jsonPath("$[1].end").isNotEmpty())
+                .andExpect(jsonPath("$[1].item.id").value(2))
+                .andExpect(jsonPath("$[1].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[1].booker.id").value(2))
+                .andExpect(jsonPath("$[1].status").value("APPROVED"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех будущих бронирований вещей пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllBookingsForUserItemsInFutureGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner?state=FUTURE")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(2))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"))
+                .andExpect(jsonPath("$[1].id").isNumber())
+                .andExpect(jsonPath("$[1].start").isNotEmpty())
+                .andExpect(jsonPath("$[1].end").isNotEmpty())
+                .andExpect(jsonPath("$[1].item.id").value(1))
+                .andExpect(jsonPath("$[1].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[1].booker.id").value(2))
+                .andExpect(jsonPath("$[1].status").value("REJECTED"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех ожидающих бронирований вещей пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllWaitingBookingsForUserItemsGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner?state=WAITING")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("WAITING"));
+    }
+
+    @Test
+    @DisplayName("Запрос всех отклоненных бронирований вещей пользователя")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getAllRejectedBookingsForUserItemsGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/owner?state=REJECTED")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].start").isNotEmpty())
+                .andExpect(jsonPath("$[0].end").isNotEmpty())
+                .andExpect(jsonPath("$[0].item.id").value(1))
+                .andExpect(jsonPath("$[0].item.name").value("Дрель"))
+                .andExpect(jsonPath("$[0].booker.id").value(2))
+                .andExpect(jsonPath("$[0].status").value("REJECTED"));
+    }
+
+    @Test
+    @DisplayName("Запрос конкретного бронирования владельцем вещи")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getInfoOfBookingForOwnerGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/1")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.start").isNotEmpty())
+                .andExpect(jsonPath("$.end").isNotEmpty())
+                .andExpect(jsonPath("$.item.id").value(2))
+                .andExpect(jsonPath("$.item.name").value("Дрель"))
+                .andExpect(jsonPath("$.booker.id").value(2))
+                .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    @DisplayName("Запрос конкретного бронирования автором бронирования")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getInfoOfBookingForBookerGetStatus200() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/1")
+                                .header("X-Sharer-User-Id", "2")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.start").isNotEmpty())
+                .andExpect(jsonPath("$.end").isNotEmpty())
+                .andExpect(jsonPath("$.item.id").value(2))
+                .andExpect(jsonPath("$.item.name").value("Дрель"))
+                .andExpect(jsonPath("$.booker.id").value(2))
+                .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    @DisplayName("Неудачный запрос конкретного бронирования не пользователем и не букером")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getInfoOfBookingForOtherUserGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/1")
+                                .header("X-Sharer-User-Id", "3")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Неудачный запрос конкретного бронирования не существующим пользователем")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getInfoOfBookingForNotFoundUserGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/1")
+                                .header("X-Sharer-User-Id", "552")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Неудачный запрос не существующего бронирования")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void getInfoOfNotFoundBookingGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings/552")
+                                .header("X-Sharer-User-Id", "1")
+                )
+                .andExpect(status().isNotFound());
     }
 }

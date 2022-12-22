@@ -134,7 +134,7 @@ public class BookingServise {
         userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException("The user with the " + userId + " is not registered."));
 
-        if (itemRepository.countAllByOwnerOrderById(userId) < 0) {
+        if (itemRepository.countAllByOwnerOrderById(userId) <= 0) {
             throw new ItemNotFoundException("User with id " + userId + "haven`t items");
         }
 
