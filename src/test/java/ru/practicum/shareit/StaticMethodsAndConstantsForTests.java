@@ -1,7 +1,6 @@
 package ru.practicum.shareit;
 
 import ru.practicum.shareit.booking.dto.RequestBookingDto;
-import ru.practicum.shareit.booking.dto.ResponseBookingDto;
 import ru.practicum.shareit.comment.dto.RequestCommentDto;
 import ru.practicum.shareit.item.dto.RequestItemDto;
 import ru.practicum.shareit.request.dto.RequestRequestDto;
@@ -37,6 +36,12 @@ public class StaticMethodsAndConstantsForTests {
             "       ('2022-11-04 06:00:00', '2022-11-05 06:00:00', 'WAITING', 2, 1), " +
             "       ('2023-11-04 06:00:00', '2023-11-05 06:00:00', 'REJECTED', 2, 1), " +
             "       ('2024-11-04 06:00:00', '2024-11-05 06:00:00', 'APPROVED', 2, 2); ";
+
+    public static final String CREATE_REQUESTS = "INSERT INTO requests (created, description, author_id) " +
+            "VALUES ('2021-11-04 06:00:00', 'Хочу дрель сверлить', 1), " +
+            "       ('2022-11-05 06:00:00', 'Нужна лопата, чтобы копать', 1), " +
+            "       ('2022-11-06 06:00:00', 'Машинка коллекционная порше', 2), " +
+            "       ('2022-11-07 06:00:00', 'Что-то, что сильно бьет и хорошо режет', 2); ";
 
     public static RequestUserDto makeRequestUserDto(String name, String email) {
         RequestUserDto dto = new RequestUserDto();

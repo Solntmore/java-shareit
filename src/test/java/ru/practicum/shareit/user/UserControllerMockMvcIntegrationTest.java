@@ -113,8 +113,7 @@ public class UserControllerMockMvcIntegrationTest {
                         get("/users")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (Arrays.asList(user1, user2, user3))));
+                .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(user1, user2, user3))));
     }
 
     @Test

@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long>, BookingRepositoryCustom {
     Booking patchStatusOfBooking(long bookingId, boolean approve, long userId);

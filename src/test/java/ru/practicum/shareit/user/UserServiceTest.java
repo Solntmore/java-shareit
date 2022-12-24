@@ -76,7 +76,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Удаление пользователя")
-    void DeleteUsersById() {
+    void deleteUsersById() {
         RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
 
         userService.createUser(requestUserDto1);
@@ -91,7 +91,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Обновление пользователя")
-    void UpdateUserById() {
+    void updateUserById() {
         RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         RequestUserDto updateRequestUserDto = makeRequestUserDto("НеОлег", "BBolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto = userService.createUser(requestUserDto);

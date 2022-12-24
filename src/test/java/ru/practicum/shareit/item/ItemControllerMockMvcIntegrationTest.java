@@ -174,57 +174,53 @@ public class ItemControllerMockMvcIntegrationTest {
     @Test
     @DisplayName("Успешный запрос информации о вещах пользователя с id 1")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
-    public void GetItemsByOwnerIdGetStatus200() throws Exception {
+    public void getItemsByOwnerIdGetStatus200() throws Exception {
 
         mockMvc.perform(
                         get("/items")
                                 .header("X-Sharer-User-Id", "1")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (Arrays.asList(item1, item2))));
+                .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(item1, item2))));
     }
 
     @Test
     @DisplayName("Неуспешный запрос информации о вещах пользователя не не валидным id")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
-    public void GetItemsByInvalidOwnerIdGetStatus200() throws Exception {
+    public void getItemsByInvalidOwnerIdGetStatus200() throws Exception {
 
         mockMvc.perform(
                         get("/items")
                                 .header("X-Sharer-User-Id", "552")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (new ArrayList<ResponseItemDto>())));
+                .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<ResponseItemDto>())));
     }
 
     @Test
     @DisplayName("Успешный запрос информации о вещах по ключевым словам")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
-    public void GetItemsByKeyWordsGetStatus200() throws Exception {
+    public void getItemsByKeyWordsGetStatus200() throws Exception {
 
         mockMvc.perform(
                         get("/items/search?text=дРелЬ")
                                 .header("X-Sharer-User-Id", "3")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (Arrays.asList(item1, item2))));
+                .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(item1, item2))));
     }
 
     @Test
     @DisplayName("Запрос информации о вещах по пустым ключевым словам")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
-    public void GetItemsByEmptyKeyWordsGetStatus200() throws Exception {
+    public void getItemsByEmptyKeyWordsGetStatus200() throws Exception {
 
         mockMvc.perform(
                         get("/items/search?text= ")
                                 .header("X-Sharer-User-Id", "3")
                 )
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (new ArrayList<ResponseItemDto>())));
+                .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<ResponseItemDto>())));
     }
 
     @Test
