@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item.mapper;
 
 import org.mapstruct.*;
-import ru.practicum.shareit.item.dto.BookingItemDto;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.item.dto.RequestItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
-import ru.practicum.shareit.item.dto.ResponseItemForRequestDto;
+import ru.practicum.shareit.request.dto.ResponseItemForRequestDto;
 import ru.practicum.shareit.item.model.Item;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")

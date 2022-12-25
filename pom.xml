@@ -188,6 +188,7 @@
 							<exclude>**/*ItemMapperImpl.*</exclude>
 							<exclude>**/*RequestMapperImpl.*</exclude>
 							<exclude>**/*UserMapperImpl.*</exclude>
+							<exclude>**/*ItemConstants.*</exclude>
 						</excludes>
 					</configuration>
 					<executions>
@@ -209,6 +210,7 @@
 									<exclude>**/*ItemMapperImpl.*</exclude>
 									<exclude>**/*RequestMapperImpl.*</exclude>
 									<exclude>**/*UserMapperImpl.*</exclude>
+									<exclude>**/*ItemConstants.*</exclude>
 								</excludes>
 								<rules>
 									<rule>

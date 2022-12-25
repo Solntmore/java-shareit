@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request.dto;
 
 import lombok.Data;
-import ru.practicum.shareit.item.dto.ResponseItemForRequestDto;
 import ru.practicum.shareit.request.model.Request;
 
 import java.io.Serializable;

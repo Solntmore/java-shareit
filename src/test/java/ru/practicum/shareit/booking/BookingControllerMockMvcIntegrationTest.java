@@ -11,14 +11,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.dto.RequestBookingDto;
+import ru.practicum.shareit.booking.dto.ResponseBookingDto;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.dto.BookingUserDto;
 import ru.practicum.shareit.user.dto.RequestUserDto;
 
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
 
 @SpringBootTest
@@ -56,6 +59,8 @@ public class BookingControllerMockMvcIntegrationTest {
     @DisplayName("Успешное создание бронирования")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
     public void createBookingGetStatus200() throws Exception {
+        ResponseBookingDto responseBookingDto = new ResponseBookingDto(1L, booking1.getStart(), booking1.getEnd(),
+                new BookingItemDto(1L, "Дрель"), new BookingUserDto(2L), Status.WAITING);
 
         mockMvc.perform(
                         post("/bookings")
@@ -64,13 +69,7 @@ public class BookingControllerMockMvcIntegrationTest {
                                 .header("X-Sharer-User-Id", "2")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.start").isNotEmpty())
-                .andExpect(jsonPath("$.end").isNotEmpty())
-                .andExpect(jsonPath("$.item.id").value(1))
-                .andExpect(jsonPath("$.item.name").value("Дрель"))
-                .andExpect(jsonPath("$.booker.id").value(2))
-                .andExpect(jsonPath("$.status").value("WAITING"));
+                .andExpect(content().json(objectMapper.writeValueAsString(responseBookingDto)));
     }
 
     @Test
@@ -182,15 +181,27 @@ public class BookingControllerMockMvcIntegrationTest {
     }
 
     @Test
-    @DisplayName("Неудачное обновление бронирования не владельцем вещи")
+    @DisplayName("Неудачное подтверждение бронирование букером")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
-    public void patchBookingNotByOwnerGetStatus404() throws Exception {
+    public void patchBookingByBookerGetStatus404() throws Exception {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=true")
                                 .header("X-Sharer-User-Id", "2")
                 )
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Неудачное подтверждение бронирование не владельцем вещи")
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
+    public void patchBookingNotByItemsOwnerGetStatus404() throws Exception {
+
+        mockMvc.perform(
+                        patch("/bookings/2?approved=true")
+                                .header("X-Sharer-User-Id", "3")
+                )
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -218,7 +229,7 @@ public class BookingControllerMockMvcIntegrationTest {
     }
 
     @Test
-    @DisplayName("Неудачное обновление несуществующего бронирования")
+    @DisplayName("Неудачное подтверждение уже подтвержденного бронирования")
     @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
     public void patchBookingThatAlreadyApprovedGetStatus404() throws Exception {
 

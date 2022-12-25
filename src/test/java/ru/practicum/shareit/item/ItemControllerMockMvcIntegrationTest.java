@@ -12,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.comment.dto.RequestCommentDto;
+import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.RequestItemDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 
@@ -45,7 +46,7 @@ public class ItemControllerMockMvcIntegrationTest {
                 true, 1);
         item2 = makeRequestItemDto("Дрель", "Нормально сверлит",
                 true, 1);
-        itemWithInvalidName = makeRequestItemDto("", "Не класть на землю",
+        itemWithInvalidName = makeRequestItemDto(" ", "Не класть на землю",
                 true, 3);
         itemWithInvalidDescription = makeRequestItemDto("Грабли", "",
                 true, 3);
@@ -132,19 +133,20 @@ public class ItemControllerMockMvcIntegrationTest {
 
     @Test
     @DisplayName("Успешный запрос информации о вещи")
-    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS})
+    @Sql(statements = {RESET_IDS, CREATE_USERS, CREATE_ITEMS, CREATE_BOOKINGS})
     public void getItemGetStatus200() throws Exception {
+        ResponseItemDto responseItemDto = new ResponseItemDto(1L, "Дрель", "Круто сверлит",
+                true, 1);
+        responseItemDto.setLastBooking(new ItemBookingDto(2L, 2L));
+        responseItemDto.setNextBooking(new ItemBookingDto(3L, 2L));
+        responseItemDto.setComments(new ArrayList<>());
 
         mockMvc.perform(
                         get("/items/1")
                                 .header("X-Sharer-User-Id", "1")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.name").value("Дрель"))
-                .andExpect(jsonPath("$.description").value("Круто сверлит"))
-                .andExpect(jsonPath("$.available").value(true))
-                .andExpect(jsonPath("$.requestId").value(1));
+                .andExpect(content().json(objectMapper.writeValueAsString(responseItemDto)));
     }
 
     @Test
