@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
+import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -66,7 +67,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(booking1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseBookingDto)));
@@ -81,7 +82,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingStartInPast))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -95,7 +96,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingStartBeforeEnd))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -109,7 +110,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(booking1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -123,7 +124,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(booking2))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -137,7 +138,7 @@ public class BookingControllerMockMvcIntegrationTest {
                         post("/bookings")
                                 .content(objectMapper.writeValueAsString(bookingWithNotFoundItem))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -149,7 +150,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=true")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -168,7 +169,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=false")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -187,7 +188,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=true")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -199,7 +200,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=true")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isForbidden());
     }
@@ -211,7 +212,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/2?approved=true")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -223,7 +224,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/552?approved=true")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -235,7 +236,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         patch("/bookings/1?approved=true")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -247,7 +248,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -272,7 +273,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -284,7 +285,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings?state=PAST")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -310,7 +311,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings?state=FUTURE")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -336,7 +337,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings?state=WAITING")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -355,7 +356,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings?state=REJECTED")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -374,7 +375,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings?state=INVALID")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -386,7 +387,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -402,7 +403,7 @@ public class BookingControllerMockMvcIntegrationTest {
         );
         mockMvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", "4")
+                                .header(X_SHADER_USER_ID, "4")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -414,7 +415,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner?state=INVALID")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -426,7 +427,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -451,7 +452,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner?state=PAST")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -477,7 +478,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner?state=FUTURE")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -503,7 +504,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner?state=WAITING")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -522,7 +523,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/owner?state=REJECTED")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -541,7 +542,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/1")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -560,7 +561,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/1")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -579,7 +580,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/1")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -591,7 +592,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/1")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -603,7 +604,7 @@ public class BookingControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/bookings/552")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isNotFound());
     }

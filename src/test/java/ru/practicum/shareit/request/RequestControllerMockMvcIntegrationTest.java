@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.CREATE_USERS;
+import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -52,7 +53,7 @@ public class RequestControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -70,7 +71,7 @@ public class RequestControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<ResponseRequestDto>())));
@@ -83,7 +84,7 @@ public class RequestControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/requests")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -97,7 +98,7 @@ public class RequestControllerMockMvcIntegrationTest {
                         post("/requests")
                                 .content(objectMapper.writeValueAsString(request1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -114,7 +115,7 @@ public class RequestControllerMockMvcIntegrationTest {
                         post("/requests")
                                 .content(objectMapper.writeValueAsString(requestWithInvalidDescription))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -128,7 +129,7 @@ public class RequestControllerMockMvcIntegrationTest {
                         post("/requests")
                                 .content(objectMapper.writeValueAsString(request1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -139,7 +140,7 @@ public class RequestControllerMockMvcIntegrationTest {
     public void getInfoAboutRequestByIdGetStatus200() throws Exception {
         mockMvc.perform(
                         get("/requests/1")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -154,7 +155,7 @@ public class RequestControllerMockMvcIntegrationTest {
     public void getInfoAboutRequestByNotFoundUserGetStatus404() throws Exception {
         mockMvc.perform(
                         get("/requests/552")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -165,7 +166,7 @@ public class RequestControllerMockMvcIntegrationTest {
     public void getInfoAboutNotFoundRequestRequestGetStatus404() throws Exception {
         mockMvc.perform(
                         get("/requests/1")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -177,7 +178,7 @@ public class RequestControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/requests/all")
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(request2, request3))));

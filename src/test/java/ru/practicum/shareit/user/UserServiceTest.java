@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -26,27 +26,32 @@ import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequest
 @Transactional
 public class UserServiceTest {
 
+    private static RequestUserDto requestUserDto1;
+    private static RequestUserDto requestUserDto2;
     @Autowired
     private UserService userService;
+
+    @BeforeAll
+    public static void makeObjects() {
+        requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
+        requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
+    }
 
     @Test
     @DisplayName("Создание пользователя")
     void createUser() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
 
         assertThat(responseUserDto.getId(), notNullValue());
-        assertThat(responseUserDto.getName(), equalTo(requestUserDto.getName()));
-        assertThat(responseUserDto.getEmail(), equalTo(requestUserDto.getEmail()));
+        assertThat(responseUserDto.getName(), equalTo(requestUserDto1.getName()));
+        assertThat(responseUserDto.getEmail(), equalTo(requestUserDto1.getEmail()));
 
     }
 
     @Test
     @DisplayName("Поиск пользователя по id")
     void findUserById() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
 
         ResponseUserDto findUserDto = userService.findUserById(responseUserDto.getId());
 
@@ -59,8 +64,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Поиск всех пользователей")
     void findAllUsers() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         userService.createUser(requestUserDto1);
         userService.createUser(requestUserDto2);
 
@@ -77,8 +80,6 @@ public class UserServiceTest {
     @Test
     @DisplayName("Удаление пользователя")
     void deleteUsersById() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-
         userService.createUser(requestUserDto1);
         List<ResponseUserDto> userList = userService.findAllUsers();
         assertThat(userList.size(), equalTo(1));
@@ -92,15 +93,13 @@ public class UserServiceTest {
     @Test
     @DisplayName("Обновление пользователя")
     void updateUserById() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         RequestUserDto updateRequestUserDto = makeRequestUserDto("НеОлег", "BBolshakov2022@yandex.ru");
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
         ResponseUserDto updateResponseUserDto = userService.updateUser(responseUserDto.getId(), updateRequestUserDto);
 
         assertThat(updateResponseUserDto.getId(), notNullValue());
         assertThat(updateResponseUserDto.getName(), equalTo("НеОлег"));
         assertThat(updateResponseUserDto.getEmail(), equalTo("BBolshakov2022@yandex.ru"));
-
     }
 
 }

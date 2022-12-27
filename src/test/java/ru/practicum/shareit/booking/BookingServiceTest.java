@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,19 +44,40 @@ public class BookingServiceTest {
     @Autowired
     private UserService userService;
 
+    private static RequestUserDto requestUserDto1;
+    private static RequestUserDto requestUserDto2;
+    private static RequestUserDto requestUserDto3;
+    private static RequestUserDto requestUserDto4;
+    private static RequestItemDto requestItemDto1;
+    private static RequestItemDto requestItemDto2;
+    private static RequestItemDto requestItemDto3;
+    private static RequestItemDto requestItemDto4;
+
+    @BeforeAll
+    public static void makeObjects() {
+        requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
+        requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
+        requestUserDto3 = makeRequestUserDto("Максим", "solntsev@yandex.ru");
+        requestUserDto4 = makeRequestUserDto("Ева", "eva2017@yandex.ru");
+        requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
+                true, 1);
+        requestItemDto2 = makeRequestItemDto("Дрель", "Нормально сверлит",
+                true, 4);
+        requestItemDto3 = makeRequestItemDto("Лопата", "Копает землю",
+                true, 2);
+        requestItemDto4 = makeRequestItemDto("Грабли", "Не класть на землю",
+                true, 3);
+    }
+
     @Test
     @DisplayName("Создание бронирования")
     void createBooking() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, userId1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, userId1);
 
         RequestBookingDto requestBookingDto = makeRequestBookingDto(LocalDateTime.now(),
                 LocalDateTime.now().plusNanos(10), responseItemDto.getId(), userId2);
@@ -65,7 +87,7 @@ public class BookingServiceTest {
         assertThat(responseBookingDto.getStart(), equalTo(requestBookingDto.getStart()));
         assertThat(responseBookingDto.getEnd(), equalTo(requestBookingDto.getEnd()));
         assertThat(responseBookingDto.getItem().getId(), notNullValue());
-        assertThat(responseBookingDto.getItem().getName(), equalTo(requestItemDto.getName()));
+        assertThat(responseBookingDto.getItem().getName(), equalTo(requestItemDto1.getName()));
         assertThat(responseBookingDto.getBooker().getId(), notNullValue());
         assertThat(responseBookingDto.getStatus(), equalTo(Status.WAITING));
     }
@@ -73,16 +95,12 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Подтверждение бронирования")
     void patchStatusOfBookingApprove() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, userId1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, userId1);
 
         RequestBookingDto requestBookingDto = makeRequestBookingDto(LocalDateTime.now(),
                 LocalDateTime.now().plusNanos(10), responseItemDto.getId(), userId2);
@@ -94,7 +112,7 @@ public class BookingServiceTest {
         assertThat(updateBookingDto.getStart(), equalTo(requestBookingDto.getStart()));
         assertThat(updateBookingDto.getEnd(), equalTo(requestBookingDto.getEnd()));
         assertThat(updateBookingDto.getItem().getId(), notNullValue());
-        assertThat(updateBookingDto.getItem().getName(), equalTo(requestItemDto.getName()));
+        assertThat(updateBookingDto.getItem().getName(), equalTo(requestItemDto1.getName()));
         assertThat(updateBookingDto.getBooker().getId(), notNullValue());
         assertThat(updateBookingDto.getStatus(), equalTo(Status.APPROVED));
     }
@@ -102,16 +120,12 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Отказ в бронировании")
     void patchStatusOfBookingReject() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, userId1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, userId1);
 
         RequestBookingDto requestBookingDto = makeRequestBookingDto(LocalDateTime.now(),
                 LocalDateTime.now().plusNanos(10), responseItemDto.getId(), userId2);
@@ -123,7 +137,7 @@ public class BookingServiceTest {
         assertThat(updateBookingDto.getStart(), equalTo(requestBookingDto.getStart()));
         assertThat(updateBookingDto.getEnd(), equalTo(requestBookingDto.getEnd()));
         assertThat(updateBookingDto.getItem().getId(), notNullValue());
-        assertThat(updateBookingDto.getItem().getName(), equalTo(requestItemDto.getName()));
+        assertThat(updateBookingDto.getItem().getName(), equalTo(requestItemDto1.getName()));
         assertThat(updateBookingDto.getBooker().getId(), notNullValue());
         assertThat(updateBookingDto.getStatus(), equalTo(Status.REJECTED));
     }
@@ -131,16 +145,12 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Получение информации о бронировании")
     void getInfoOfBooking() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, userId1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, userId1);
 
         RequestBookingDto requestBookingDto = makeRequestBookingDto(LocalDateTime.now(),
                 LocalDateTime.now().plusNanos(10), responseItemDto.getId(), userId2);
@@ -159,21 +169,11 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Получение информации о всех бронированиях пользователя")
     void getAllBookingsOfUserInStatusAll() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        RequestItemDto requestItemDto2 = makeRequestItemDto("Дрель", "Нормально сверлит",
-                true, 4);
-        RequestItemDto requestItemDto3 = makeRequestItemDto("Лопата", "Копает землю",
-                true, 2);
-        RequestItemDto requestItemDto4 = makeRequestItemDto("Грабли", "Не класть на землю",
-                true, 3);
         ResponseItemDto responseItemDto1 = itemService.createItem(requestItemDto1, userId1);
         ResponseItemDto responseItemDto2 = itemService.createItem(requestItemDto2, userId1);
         ResponseItemDto responseItemDto3 = itemService.createItem(requestItemDto3, userId1);
@@ -210,21 +210,11 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Получение информации о бронированиях, ожидающих подтверждения")
     void getAllBookingsOfUserInStatusWaiting() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
 
-        RequestItemDto requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        RequestItemDto requestItemDto2 = makeRequestItemDto("Дрель", "Нормально сверлит",
-                true, 4);
-        RequestItemDto requestItemDto3 = makeRequestItemDto("Лопата", "Копает землю",
-                true, 2);
-        RequestItemDto requestItemDto4 = makeRequestItemDto("Грабли", "Не класть на землю",
-                true, 3);
         ResponseItemDto responseItemDto1 = itemService.createItem(requestItemDto1, userId1);
         ResponseItemDto responseItemDto2 = itemService.createItem(requestItemDto2, userId1);
         ResponseItemDto responseItemDto3 = itemService.createItem(requestItemDto3, userId1);
@@ -260,21 +250,14 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Получение информации о всех бронированиях вещи пользователя")
     void getAllBookingsForUsersItemsAll() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
-        RequestUserDto requestUserDto3 = makeRequestUserDto("Максим", "solntsev@yandex.ru");
         ResponseUserDto responseUserDto3 = userService.createUser(requestUserDto3);
         long userId3 = responseUserDto3.getId();
-        RequestUserDto requestUserDto4 = makeRequestUserDto("Ева", "eva2017@yandex.ru");
         ResponseUserDto responseUserDto4 = userService.createUser(requestUserDto4);
         long userId4 = responseUserDto4.getId();
-
-        RequestItemDto requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
 
         ResponseItemDto responseItemDto1 = itemService.createItem(requestItemDto1, userId1);
 
@@ -307,21 +290,14 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Получение информации о всех бронированиях вещи пользователя в статусе ожидание")
     void getAllBookingsForUsersItemsInStatusWaiting() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
         long userId1 = responseUserDto1.getId();
-        RequestUserDto requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
         ResponseUserDto responseUserDto2 = userService.createUser(requestUserDto2);
         long userId2 = responseUserDto2.getId();
-        RequestUserDto requestUserDto3 = makeRequestUserDto("Максим", "solntsev@yandex.ru");
         ResponseUserDto responseUserDto3 = userService.createUser(requestUserDto3);
         long userId3 = responseUserDto3.getId();
-        RequestUserDto requestUserDto4 = makeRequestUserDto("Ева", "eva2017@yandex.ru");
         ResponseUserDto responseUserDto4 = userService.createUser(requestUserDto4);
         long userId4 = responseUserDto4.getId();
-
-        RequestItemDto requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
 
         ResponseItemDto responseItemDto1 = itemService.createItem(requestItemDto1, userId1);
 

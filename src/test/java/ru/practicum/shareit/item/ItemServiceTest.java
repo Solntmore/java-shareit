@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,37 +44,51 @@ public class ItemServiceTest {
     @Autowired
     private BookingServise bookingServise;
 
+    private static RequestUserDto requestUserDto1;
+    private static RequestUserDto requestUserDto2;
+    private static RequestItemDto requestItemDto1;
+    private static RequestItemDto requestItemDto2;
+    private static RequestItemDto requestItemDto3;
+    private static RequestItemDto requestItemDto4;
+
+    @BeforeAll
+    public static void makeObjects() {
+        requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
+        requestUserDto2 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
+        requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
+                true, 1);
+        requestItemDto2 = makeRequestItemDto("Дрель", "Нормально сверлит",
+                true, 4);
+        requestItemDto3 = makeRequestItemDto("Лопата", "Копает землю",
+                true, 2);
+        requestItemDto4 = makeRequestItemDto("Грабли", "Не класть на землю",
+                true, 3);
+    }
+
     @Test
     @DisplayName("Создание вещи")
     void createItem() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, responseUserDto.getId());
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, responseUserDto.getId());
 
         ResponseItemDto findItem = itemService.findItemAndUserById(responseItemDto.getId(), responseUserDto.getId());
 
         assertThat(findItem.getId(), notNullValue());
-        assertThat(findItem.getName(), equalTo(requestItemDto.getName()));
-        assertThat(findItem.getDescription(), equalTo(requestItemDto.getDescription()));
-        assertThat(findItem.getAvailable(), equalTo(requestItemDto.getAvailable()));
-        assertThat(findItem.getRequestId(), equalTo(requestItemDto.getRequestId()));
+        assertThat(findItem.getName(), equalTo(requestItemDto1.getName()));
+        assertThat(findItem.getDescription(), equalTo(requestItemDto1.getDescription()));
+        assertThat(findItem.getAvailable(), equalTo(requestItemDto1.getAvailable()));
+        assertThat(findItem.getRequestId(), equalTo(requestItemDto1.getRequestId()));
     }
 
     @Test
     @DisplayName("Обновление вещи")
     void updateItem() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
         RequestItemDto updateRequestItemDto = makeRequestItemDto("Молоток", "Бьет гвозди",
                 true, 1);
 
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, responseUserDto.getId());
-        ResponseItemDto updateResponseItemDto = itemService.updateItem(updateRequestItemDto, responseItemDto.getId(),
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, responseUserDto.getId());
+        itemService.updateItem(updateRequestItemDto, responseItemDto.getId(),
                 responseUserDto.getId());
 
         ResponseItemDto findItem = itemService.findItemAndUserById(responseItemDto.getId(), responseUserDto.getId());
@@ -88,37 +103,24 @@ public class ItemServiceTest {
     @Test
     @DisplayName("Поиск вещи")
     void findItem() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, responseUserDto.getId());
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, responseUserDto.getId());
 
         ResponseItemDto findItem = itemService.findItemAndUserById(responseItemDto.getId(), responseUserDto.getId());
 
         assertThat(findItem.getId(), notNullValue());
-        assertThat(findItem.getName(), equalTo(requestItemDto.getName()));
-        assertThat(findItem.getDescription(), equalTo(requestItemDto.getDescription()));
-        assertThat(findItem.getAvailable(), equalTo(requestItemDto.getAvailable()));
-        assertThat(findItem.getRequestId(), equalTo(requestItemDto.getRequestId()));
+        assertThat(findItem.getName(), equalTo(requestItemDto1.getName()));
+        assertThat(findItem.getDescription(), equalTo(requestItemDto1.getDescription()));
+        assertThat(findItem.getAvailable(), equalTo(requestItemDto1.getAvailable()));
+        assertThat(findItem.getRequestId(), equalTo(requestItemDto1.getRequestId()));
     }
 
     @Test
     @DisplayName("Поиск вещи по описанию")
     void findAllItemsWithParameters() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestItemDto requestItemDto1 = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
-        RequestItemDto requestItemDto2 = makeRequestItemDto("Дрель", "Нормально сверлит",
-                true, 4);
-        RequestItemDto requestItemDto3 = makeRequestItemDto("Лопата", "Копает землю",
-                true, 2);
-        RequestItemDto requestItemDto4 = makeRequestItemDto("Грабли", "Не класть на землю",
-                true, 3);
 
 
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
         itemService.createItem(requestItemDto1, responseUserDto.getId());
         itemService.createItem(requestItemDto2, responseUserDto.getId());
         itemService.createItem(requestItemDto3, responseUserDto.getId());
@@ -136,14 +138,10 @@ public class ItemServiceTest {
     @Test
     @DisplayName("Добавление комментария")
     void addCommentToItem() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Максим", "konovalov1992@yandex.ru");
-        RequestItemDto requestItemDto = makeRequestItemDto("Дрель", "Круто сверлит",
-                true, 1);
 
-        ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
-        ResponseUserDto bookerDto = userService.createUser(requestUserDto1);
-        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto, responseUserDto.getId());
+        ResponseUserDto responseUserDto = userService.createUser(requestUserDto1);
+        ResponseUserDto bookerDto = userService.createUser(requestUserDto2);
+        ResponseItemDto responseItemDto = itemService.createItem(requestItemDto1, responseUserDto.getId());
 
         RequestBookingDto requestBookingDto = makeRequestBookingDto(LocalDateTime.now(),
                 LocalDateTime.now().plusNanos(10), responseItemDto.getId(), bookerDto.getId());

@@ -36,7 +36,6 @@ public class StaticMethodsAndConstantsForTests {
             "       ('2022-11-04 06:00:00', '2022-11-05 06:00:00', 'WAITING', 2, 1), " +
             "       ('2023-11-04 06:00:00', '2023-11-05 06:00:00', 'REJECTED', 2, 1), " +
             "       ('2024-11-04 06:00:00', '2024-11-05 06:00:00', 'APPROVED', 2, 2); ";
-
     public static final String CREATE_REQUESTS = "INSERT INTO requests (created, description, author_id) " +
             "VALUES ('2021-11-04 06:00:00', 'Хочу дрель сверлить', 1), " +
             "       ('2022-11-05 06:00:00', 'Нужна лопата, чтобы копать', 1), " +

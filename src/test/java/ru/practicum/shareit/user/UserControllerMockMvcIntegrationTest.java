@@ -12,7 +12,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dto.RequestUserDto;
-import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.Arrays;
 
@@ -33,8 +32,6 @@ public class UserControllerMockMvcIntegrationTest {
     private static RequestUserDto userInvalidName;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private MockMvc mockMvc;
 

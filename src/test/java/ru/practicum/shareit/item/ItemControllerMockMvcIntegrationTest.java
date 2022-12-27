@@ -22,6 +22,7 @@ import java.util.Arrays;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
+import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
 
 @SpringBootTest
@@ -65,7 +66,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items")
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -84,7 +85,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items")
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -98,7 +99,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items")
                                 .content(objectMapper.writeValueAsString(itemWithInvalidName))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -112,7 +113,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items")
                                 .content(objectMapper.writeValueAsString(itemWithInvalidDescription))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -126,7 +127,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items")
                                 .content(objectMapper.writeValueAsString(itemWithInvalidAvailable))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -143,7 +144,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items/1")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(responseItemDto)));
@@ -156,7 +157,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items/552")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -168,7 +169,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items/1")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -180,7 +181,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items")
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(item1, item2))));
@@ -193,7 +194,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items")
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<ResponseItemDto>())));
@@ -206,7 +207,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items/search?text=дРелЬ")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Arrays.asList(item1, item2))));
@@ -219,7 +220,7 @@ public class ItemControllerMockMvcIntegrationTest {
 
         mockMvc.perform(
                         get("/items/search?text= ")
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<ResponseItemDto>())));
@@ -234,7 +235,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         patch("/items/3")
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -253,7 +254,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         patch("/items/3")
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -267,7 +268,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         patch("/items/3")
                                 .content(objectMapper.writeValueAsString(item1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isForbidden());
     }
@@ -281,7 +282,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         patch("/items/1")
                                 .content(objectMapper.writeValueAsString(itemWithInvalidName))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isConflict());
     }
@@ -295,7 +296,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         patch("/items/1")
                                 .content(objectMapper.writeValueAsString(itemWithInvalidDescription))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "1")
+                                .header(X_SHADER_USER_ID, "1")
                 )
                 .andExpect(status().isConflict());
     }
@@ -309,7 +310,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items/1/comment")
                                 .content(objectMapper.writeValueAsString(comment1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
@@ -326,7 +327,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items/1/comment")
                                 .content(objectMapper.writeValueAsString(comment1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "3")
+                                .header(X_SHADER_USER_ID, "3")
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -340,7 +341,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items/1/comment")
                                 .content(objectMapper.writeValueAsString(comment1))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "552")
+                                .header(X_SHADER_USER_ID, "552")
                 )
                 .andExpect(status().isNotFound());
     }
@@ -354,7 +355,7 @@ public class ItemControllerMockMvcIntegrationTest {
                         post("/items/1/comment")
                                 .content(objectMapper.writeValueAsString(commentInvalid))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Sharer-User-Id", "2")
+                                .header(X_SHADER_USER_ID, "2")
                 )
                 .andExpect(status().isBadRequest());
     }

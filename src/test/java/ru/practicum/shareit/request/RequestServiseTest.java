@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestItemDto;
-import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequestRequestDto;
+import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -30,19 +30,28 @@ import static ru.practicum.shareit.StaticMethodsAndConstantsForTests.makeRequest
 @Transactional
 public class RequestServiseTest {
 
+    private static RequestUserDto requestUserDto;
+    private static RequestRequestDto requestRequestDto1;
+    private static RequestRequestDto requestRequestDto2;
+    private static RequestRequestDto requestRequestDto3;
     @Autowired
     private RequestService requestService;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private ItemService itemService;
+
+    @BeforeAll
+    public static void makeObjects() {
+        requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
+        requestRequestDto1 = makeRequestRequestDto("Нужно лопата, которая копает снег");
+        requestRequestDto2 = makeRequestRequestDto("Нужна дрель, которая сверлит стены");
+        requestRequestDto3 = makeRequestRequestDto("Нужна ружье, которое стреляет в белок");
+    }
 
     @Test
     @DisplayName("Создание запроса")
     void createItem() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
         RequestRequestDto requestRequestDto = makeRequestRequestDto("Нужно лопата, которая копает снег");
 
         ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
@@ -57,11 +66,6 @@ public class RequestServiseTest {
     @Test
     @DisplayName("Поиск своих запросов")
     void getMyItemsRequest() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestRequestDto requestRequestDto1 = makeRequestRequestDto("Нужно лопата, которая копает снег");
-        RequestRequestDto requestRequestDto2 = makeRequestRequestDto("Нужна дрель, которая сверлит стены");
-        RequestRequestDto requestRequestDto3 = makeRequestRequestDto("Нужна ружье, которое стреляет в белок");
-
         ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
         long userId = responseUserDto.getId();
         requestService.createItemRequest(userId, requestRequestDto1);
@@ -78,11 +82,6 @@ public class RequestServiseTest {
     @Test
     @DisplayName("Поиск чужих запросов")
     void getInfoOfRequest() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestRequestDto requestRequestDto1 = makeRequestRequestDto("Нужно лопата, которая копает снег");
-        RequestRequestDto requestRequestDto2 = makeRequestRequestDto("Нужна дрель, которая сверлит стены");
-        RequestRequestDto requestRequestDto3 = makeRequestRequestDto("Нужна ружье, которое стреляет в белок");
-
         ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
         long userId = responseUserDto.getId();
         requestService.createItemRequest(userId, requestRequestDto1);
@@ -99,29 +98,24 @@ public class RequestServiseTest {
     @Test
     @DisplayName("Поиск информации о конкретном запросе без вещей")
     void getInformationAboutOneRequestWithoutItems() {
-        RequestUserDto requestUserDto = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        RequestRequestDto requestRequestDto = makeRequestRequestDto("Нужно лопата, которая копает снег");
-
         ResponseUserDto responseUserDto = userService.createUser(requestUserDto);
         long authorId = responseUserDto.getId();
-        ResponseRequestDto responseRequestDto = requestService.createItemRequest(authorId, requestRequestDto);
+        ResponseRequestDto responseRequestDto = requestService.createItemRequest(authorId, requestRequestDto1);
         long requestId = responseRequestDto.getId();
 
         ResponseRequestDto findRequest = requestService.getInformationAboutOneRequest(authorId, requestId);
         assertThat(findRequest.getId(), notNullValue());
         assertThat(findRequest.getCreated(), notNullValue());
         assertThat(findRequest.getItems().size(), equalTo(0));
-        assertThat(findRequest.getDescription(), equalTo(requestRequestDto.getDescription()));
+        assertThat(findRequest.getDescription(), equalTo(requestRequestDto1.getDescription()));
     }
 
     @Test
     @DisplayName("Поиск информации о конкретном запросе с вещами")
     void getInformationAboutOneRequestWithItems() {
-        RequestUserDto requestUserDto1 = makeRequestUserDto("Олег", "bolshakov2022@yandex.ru");
-        ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto1);
+        ResponseUserDto responseUserDto1 = userService.createUser(requestUserDto);
         long authorId1 = responseUserDto1.getId();
-        RequestRequestDto requestRequestDto = makeRequestRequestDto("Нужно лопата, которая копает снег");
-        ResponseRequestDto responseRequestDto = requestService.createItemRequest(authorId1, requestRequestDto);
+        ResponseRequestDto responseRequestDto = requestService.createItemRequest(authorId1, requestRequestDto1);
         long requestId = responseRequestDto.getId();
 
 
@@ -144,14 +138,6 @@ public class RequestServiseTest {
         assertThat(findRequest.getId(), notNullValue());
         assertThat(findRequest.getCreated(), notNullValue());
         assertThat(findRequest.getItems().size(), equalTo(3));
-        assertThat(findRequest.getDescription(), equalTo(requestRequestDto.getDescription()));
-    }
-
-    private RequestUserDto makeRequestUserDto(String name, String email) {
-        RequestUserDto dto = new RequestUserDto();
-        dto.setName(name);
-        dto.setEmail(email);
-
-        return dto;
+        assertThat(findRequest.getDescription(), equalTo(requestRequestDto1.getDescription()));
     }
 }
