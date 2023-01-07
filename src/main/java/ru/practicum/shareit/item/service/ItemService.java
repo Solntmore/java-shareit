@@ -45,6 +45,8 @@ public class ItemService {
     private final BookingMapper bookingMapper;
 
     public ResponseItemDto createItem(RequestItemDto requestItemDto, long userId) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException("The user with the " + userId + " is not registered."));
 
         return itemMapper.itemToResponseItemDto(
                 itemRepository.save(
