@@ -73,7 +73,12 @@
 			<artifactId>guava</artifactId>
 			<version>31.1-jre</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<resources>
@@ -182,6 +187,14 @@
 					<version>0.8.8</version>
 					<configuration>
 						<output>file</output>
+						<excludes>
+							<exclude>**/*BookingMapperImpl.*</exclude>
+							<exclude>**/*CommentMapperImpl.*</exclude>
+							<exclude>**/*ItemMapperImpl.*</exclude>
+							<exclude>**/*RequestMapperImpl.*</exclude>
+							<exclude>**/*UserMapperImpl.*</exclude>
+							<exclude>**/*ItemConstants.*</exclude>
+						</excludes>
 					</configuration>
 					<executions>
 						<execution>
@@ -196,6 +209,14 @@
 								<goal>check</goal>
 							</goals>
 							<configuration>
+								<excludes>
+									<exclude>**/*BookingMapperImpl.*</exclude>
+									<exclude>**/*CommentMapperImpl.*</exclude>
+									<exclude>**/*ItemMapperImpl.*</exclude>
+									<exclude>**/*RequestMapperImpl.*</exclude>
+									<exclude>**/*UserMapperImpl.*</exclude>
+									<exclude>**/*ItemConstants.*</exclude>
+								</excludes>
 								<rules>
 									<rule>
 										<element>BUNDLE</element>

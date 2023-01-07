@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
-public class InvalidDescriptionException extends RuntimeException {
+public class InvalidNameException extends RuntimeException {
 
-    public InvalidDescriptionException(String message) {
+    public InvalidNameException(String message) {
         super(message);
     }
 

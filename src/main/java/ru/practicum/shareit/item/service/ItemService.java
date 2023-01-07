@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -78,11 +79,12 @@ public class ItemService {
         return setLastAndNextBooking(itemId, responseItemDto);
     }
 
-    public List<ResponseItemDto> findAllItemsWithParameters(long userId, String query) {
+    public List<ResponseItemDto> findAllItemsWithParameters(long userId, String query, PageRequest pageRequest) {
         if (query == null) {
             log.debug("Get /items request was received. Get all items with ownerId {}.", userId);
 
-            return itemRepository.findAllByOwnerOrderByIdAsc(userId)
+            return itemRepository.findAllByOwnerOrderByIdAsc(userId, pageRequest)
+                    .getContent()
                     .stream()
                     .map(itemMapper::itemToResponseItemDto)
                     .map(responseItemDto -> setLastAndNextBooking(responseItemDto.getId(), responseItemDto))

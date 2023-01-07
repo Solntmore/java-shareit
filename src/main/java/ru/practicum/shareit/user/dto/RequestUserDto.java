@@ -14,9 +14,9 @@ import java.io.Serializable;
 public class RequestUserDto implements Serializable {
 
     @NotBlank(message = "Name may not be blank")
-    private final String name;
+    private String name;
 
     @Email(message = "Enter the correct email.")
     @NotNull(message = "Email can`t be null.")
-    private final String email;
+    private String email;
 }

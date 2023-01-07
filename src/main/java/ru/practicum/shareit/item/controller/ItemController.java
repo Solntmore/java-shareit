@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.RequestCommentDto;
 import ru.practicum.shareit.comment.dto.ResponseCommentDto;
@@ -11,14 +12,17 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
+import static ru.practicum.shareit.Convert.toPageRequest;
 import static ru.practicum.shareit.item.ItemConstants.X_SHADER_USER_ID;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
+@Validated
 public class ItemController {
 
     private final ItemService itemService;
@@ -26,10 +30,14 @@ public class ItemController {
 
     @GetMapping(value = {"/search", ""})
     public List<ResponseItemDto> findItemsWithParameters(@RequestHeader(X_SHADER_USER_ID) long userId,
-                                                         @RequestParam(name = "text", required = false) String query) {
+                                                         @RequestParam(name = "text", required = false) String query,
+                                                         @RequestParam(required = false, defaultValue = "0")
+                                                         @Min(0) int from,
+                                                         @RequestParam(required = false, defaultValue = "100")
+                                                         @Min(0) int size) {
         log.debug("Method findItemsWithParameters in ItemController is running");
 
-        return itemService.findAllItemsWithParameters(userId, query);
+        return itemService.findAllItemsWithParameters(userId, query, toPageRequest(from, size));
     }
 
     @GetMapping("/{itemId}")

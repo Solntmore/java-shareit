@@ -1,12 +1,11 @@
-package ru.practicum.shareit.user.exceptions;
+package ru.practicum.shareit.request.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.CONFLICT)
-public class InvalidNameException extends RuntimeException {
-
-    public InvalidNameException(String message) {
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
+public class RequestNotFoundException extends RuntimeException {
+    public RequestNotFoundException(String message) {
         super(message);
     }
 

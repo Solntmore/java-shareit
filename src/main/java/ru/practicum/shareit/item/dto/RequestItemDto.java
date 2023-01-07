@@ -13,11 +13,13 @@ import java.io.Serializable;
 public class RequestItemDto implements Serializable {
 
     @NotBlank
-    private final String name;
+    private String name;
 
     @NotBlank
-    private final String description;
+    private String description;
 
     @NotNull
-    private final Boolean available;
+    private Boolean available;
+
+    private long requestId;
 }

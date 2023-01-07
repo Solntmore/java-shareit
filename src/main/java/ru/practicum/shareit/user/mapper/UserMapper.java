@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.mapper;
 
 import org.mapstruct.*;
-import ru.practicum.shareit.user.dto.BookingUserDto;
+import ru.practicum.shareit.booking.dto.BookingUserDto;
 import ru.practicum.shareit.user.dto.RequestUserDto;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.model.User;

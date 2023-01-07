@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.storage;
 import org.springframework.context.annotation.Lazy;
 import ru.practicum.shareit.item.exceptions.ForbiddenOwnerException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.exceptions.InvalidNameException;
+import ru.practicum.shareit.item.exceptions.InvalidNameException;
 
 import java.util.Optional;
 

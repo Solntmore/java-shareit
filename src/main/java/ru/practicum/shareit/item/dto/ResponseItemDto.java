@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.Data;
-import ru.practicum.shareit.booking.dto.ItemBookingDto;
 import ru.practicum.shareit.comment.dto.ResponseCommentDto;
 
 import java.io.Serializable;
@@ -20,6 +19,8 @@ public class ResponseItemDto implements Serializable {
     private final String description;
 
     private final Boolean available;
+
+    private final long requestId;
 
     private ItemBookingDto lastBooking;
 
