@@ -46,7 +46,7 @@ public class BookingClient extends BaseClient {
         Map<String, Object> parameters = Map.of(
                 "bookingId", bookingId
         );
-        return get("{/bookingId}", userId, parameters);
+        return get("/{bookingId}", userId, parameters);
     }
 
 

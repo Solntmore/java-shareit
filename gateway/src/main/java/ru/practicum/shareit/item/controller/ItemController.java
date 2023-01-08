@@ -6,17 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.comment.dto.RequestCommentDto;
-import ru.practicum.shareit.comment.dto.ResponseCommentDto;
 import ru.practicum.shareit.item.client.ItemClient;
 import ru.practicum.shareit.item.dto.RequestItemDto;
-import ru.practicum.shareit.item.dto.ResponseItemDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 import static ru.practicum.shareit.Constants.X_SHADER_USER_ID;
-import static ru.practicum.shareit.Convert.toPageRequest;
 
 @Slf4j
 @RestController

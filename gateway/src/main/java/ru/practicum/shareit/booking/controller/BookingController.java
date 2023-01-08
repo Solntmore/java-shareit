@@ -38,7 +38,7 @@ public class BookingController {
         log.debug("A Patch/bookings/{}?approved={} request was received. Approve booking with owner id {}.",
                 bookingId, approved, userId);
 
-        return bookingClient.patchStatusOfBooking(bookingId, approved, userId);
+        return bookingClient.patchStatusOfBooking(userId, approved, bookingId);
     }
 
     @GetMapping("/{bookingId}")
@@ -47,7 +47,7 @@ public class BookingController {
         log.debug("A Get/bookings/{} request was received. Get information of booking {} with owner id {}.",
                 bookingId, bookingId, userId);
 
-        return bookingClient.getInfoOfBooking(bookingId, userId);
+        return bookingClient.getInfoOfBooking(userId, bookingId);
     }
 
     @GetMapping

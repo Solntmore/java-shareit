@@ -1,0 +1,43 @@
+version: '2.2'
+services:
+  gateway:
+    build: gateway/target/shareit-gateway-0.0.1-SNAPSHOT.jar
+    container_name: shareItGateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SHAREIT_SERVER_URL=http://server:9090
+      - DB_NAME=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=localhost
+      - DB_PORT=5432
+
+  server:
+    build: .
+    container_name: shareItServer
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=localhost
+      - DB_PORT=5432
+
+  db:
+    image: postgres:13.7-alpine
+    container_name: shareItDB
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=localhost
+      - DB_PORT=5432
