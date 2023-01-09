@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   gateway:
-    build: gateway/target/shareit-gateway-0.0.1-SNAPSHOT.jar
+    build: ./gateway
     container_name: shareItGateway
     ports:
       - "8080:8080"
@@ -16,7 +16,7 @@ services:
       - DB_PORT=5432
 
   server:
-    build: .
+    build: ./server
     container_name: shareItServer
     ports:
       - "9090:9090"
