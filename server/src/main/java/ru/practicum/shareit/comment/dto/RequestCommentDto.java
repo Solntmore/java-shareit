@@ -11,5 +11,5 @@ import java.io.Serializable;
 @Data
 public class RequestCommentDto implements Serializable {
 
-    String text;
+    private String text;
 }
