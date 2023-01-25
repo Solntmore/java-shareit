@@ -1,4 +1,11 @@
 # java-shareit
-Template repository for Shareit project.
-You can use swagger: http://localhost:8080/swagger-ui/index.html#/
 
+Стек: Java, Spring Boot, Docker, Hibernate, PostgreSQL, Maven, REST, Swagger, Git.
+
+ShareIt - Аналог Авито. Приложение, которое поможет сдавать или брать в аренду вещи.
+Внедрил использование библиотеки MapStruct, что позволило сократить время написания кода за счет автоматизации создания
+мапперов. Также использовал плагин JPA Buddy, что сократило время на создание DTO.
+
+Планируется добавить авторизацию с помощью Spring Security, кэширование запросов с помощью Redis.
+
+Для просмотра энд-поинтов вы можете воспользоваться сваггером: http://localhost:8080/swagger-ui/index.html#/
